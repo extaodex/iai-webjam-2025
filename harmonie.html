@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Harmonie Globale - Un Monde Sans Frontières</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .harmonie-theme { background: linear-gradient(135deg, #6a82fb, #fc5c7d); }
+    
+    .narrative-section {
+      padding: 4rem 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .narrative-section:last-child {
+      border-bottom: none;
+    }
+
+    .narrative-intro {
+      max-width: 800px;
+      margin: 0 auto 3rem;
+      text-align: center;
+      color: white;
+    }
+    .narrative-intro h2 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+    .narrative-intro p {
+      font-size: 1.1rem;
+      opacity: 0.9;
+    }
+
+    .harmony-gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .harmony-gallery .gallery-item {
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      transition: transform 0.4s ease, box-shadow 0.4s ease;
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    .harmony-gallery .gallery-item.animate {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .harmony-gallery .gallery-item:hover {
+      transform: scale(1.05);
+      box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+      z-index: 10;
+    }
+
+    .harmony-gallery .gallery-item img {
+      width: 100%;
+      height: 250px;
+      object-fit: cover;
+    }
+
+    .final-message {
+      text-align: center;
+      color: white;
+      padding: 4rem 1rem;
+    }
+    .final-message h2 {
+      font-size: 2.2rem;
+      margin-bottom: 1rem;
+    }
+    .final-message p {
+      font-size: 1.2rem;
+      max-width: 700px;
+      margin: 0 auto 2rem;
+    }
+    .final-message .heart {
+      font-size: 3rem;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+  </style>
+</head>
+<body class="harmonie-theme">
+  <header class="content-header">
+    <h1>🤝 Harmonie Globale</h1>
+    <nav>
+      <a href="index.html">Accueil 🏠</a>
+      <a href="afrique.html">Afrique 🌍</a>
+      <a href="europe.html">Europe 🎶</a>
+      <a href="asie.html">Asie 🏯</a>
+      <a href="ameriques.html">Amériques 🎤</a>
+      <a href="oceanie.html">Océanie 🏝️</a>
+      <a href="harmonie.html">Harmonie 🤝</a>
+    </nav>
+  </header>
+
+  <div class="container">
+
+    <!-- Acte 1: Échos des Continents -->
+    <section class="narrative-section">
+      <div class="narrative-intro">
+        <h2>Échos des Continents</h2>
+        <p>Nous avons voyagé à travers des terres riches de traditions uniques, goûté à des saveurs inoubliables et vibré au son de rythmes ancestraux. Un rappel de la beauté de nos racines.</p>
+      </div>
+      <div class="harmony-gallery">
+        <div class="gallery-item">
+          <img src="images/Grio racontant une histoire a des enfants.png" alt="Un griot conte une histoire en Afrique.">
+          <div class="gallery-caption">La Sagesse Africaine</div>
+        </div>
+        <div class="gallery-item">
+          <img src="images/le Flamenco.png" alt="Danseurs de Flamenco en Europe.">
+          <div class="gallery-caption">La Passion Européenne</div>
+        </div>
+        <div class="gallery-item">
+          <img src="images/La cérémonie du thé japonaise, ou Chanoy.png" alt="Cérémonie du thé en Asie.">
+          <div class="gallery-caption">La Sérénité Asiatique</div>
+        </div>
+        <div class="gallery-item">
+          <img src="images/danseuse de samba en costume extravagant lors du carnaval de rio.png" alt="Carnaval de Rio en Amérique.">
+          <div class="gallery-caption">L'Exubérance Américaine</div>
+        </div>
+        <div class="gallery-item">
+          <img src="images/Danse  Haka.png" alt="Danse Haka en Océanie.">
+          <div class="gallery-caption">La Force Océanienne</div>
+        </div>
+         <div class="gallery-item">
+          <img src="images/plat de riz jollof africain.png" alt="Plat de riz Jollof.">
+          <div class="gallery-caption">Le Goût du Partage</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Acte 2: Ponts entre les Cultures -->
+    <section class="narrative-section">
+      <div class="narrative-intro">
+        <h2>Ponts entre les Cultures</h2>
+        <p>...pour découvrir qu'au-delà des frontières, des ponts se créent chaque jour. Quand les mains se tendent, les cœurs s'ouvrent et les cultures s'enrichissent mutuellement.</p>
+      </div>
+      <div class="harmony-gallery">
+        <div class="gallery-item">
+          <img src="images/plusieurs etnie a table.png" alt="Personnes de cultures différentes partageant un repas.">
+          <div class="gallery-caption">Un Repas, Mille Saveurs</div>
+        </div>
+        <div class="gallery-item">
+          <img src="images/la salsa tous continants confondu.png" alt="Couples de diverses origines dansant la salsa.">
+          <div class="gallery-caption">Une Danse, Plusieurs Âmes</div>
+        </div>
+        <div class="gallery-item">
+          <img src="images/personne des 5 continants faire des calligraphie chinoise ou japonaise.png" alt="Atelier de calligraphie multiculturel.">
+          <div class="gallery-caption">Un Art, Des Mains Unies</div>
+        </div>
+        <div class="gallery-item">
+          <img src="images/Musique - Didgeridoo qui reunit tous les personnes de differents continents .png" alt="Personnes de tous horizons écoutant un joueur de didgeridoo.">
+          <div class="gallery-caption">Une Note, Une Humanité</div>
+        </div>
+        <div class="gallery-item">
+          <img src="images/personne des 5 continant en train de danser le Haka.png" alt="Groupe multiculturel apprenant le Haka.">
+          <div class="gallery-caption">Une Force, Un Esprit</div>
+        </div>
+        <div class="gallery-item">
+          <img src="images/une table avec tous les plat .png" alt="Table garnie de plats du monde entier.">
+          <div class="gallery-caption">Le Banquet du Monde</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Acte 3: Message Final -->
+    <section class="final-message">
+      <h2>Le Voyage Continue</h2>
+      <p>Ce site se termine, mais le véritable voyage ne fait que commencer. Partagez une saveur, un rythme, une histoire. Le monde sans frontières est entre nos mains.</p>
+      <div class="heart">❤️</div>
+    </section>
+
+  </div>
+
+  <footer>
+    <p>IAI WebJam 2025</p>
+  </footer>
+
+  <script src="animations.js" defer></script>
+</body>
+</html>

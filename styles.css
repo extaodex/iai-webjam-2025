@@ -1,0 +1,652 @@
+/* ===== STYLES COMMUNS ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  color: #333;
+  min-height: 100vh;
+  line-height: 1.6;
+  background: #f5f5f5;
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='48' viewport='0 0 100 100' style='fill:black;font-size:24px;'><text y='50%'>✨</text></svg>"), auto;
+}
+
+/* ===== HEADERS ===== */
+/* Header de la page d'accueil */
+body[class=""] header, header:has(div.intro-image) {
+  background: linear-gradient(90deg, #ff6f61, #ffcc70);
+  color: white;
+  width: 100%;
+  padding: 2rem;
+  position: relative;
+  z-index: 2;
+}
+
+/* Header des pages de contenu */
+.content-header {
+  background: rgba(0,0,0,0.9);
+  color: white;
+  padding: 1rem;
+  text-align: center;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.content-header h1 {
+  margin: 0;
+  font-size: 1.8rem;
+  font-weight: 600;
+}
+
+.content-header nav {
+  margin-top: 0.5rem;
+}
+
+.content-header nav a {
+  margin: 0 0.5rem;
+  padding: 0.5rem 1rem;
+  text-decoration: none;
+  font-weight: 600;
+  color: white;
+  border-radius: 20px;
+  transition: background-color 0.3s;
+  font-size: 0.9rem;
+}
+
+.content-header nav a:hover {
+  background-color: rgba(255,255,255,0.2);
+}
+
+/* ===== STRUCTURE & SECTIONS COMMUNES ===== */
+.container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.hero {
+  text-align: center;
+  color: white;
+  margin-bottom: 3rem;
+  padding: 2rem 0;
+}
+
+.hero h2 {
+  font-size: 3rem;
+  margin: 0;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+  font-weight: 600;
+}
+
+.hero p {
+  font-size: 1.2rem;
+  margin: 1rem 0;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+}
+
+.special-section {
+  background: rgba(255,255,255,0.9);
+  border-radius: 15px;
+  padding: 2rem;
+  margin: 3rem 0;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.6s ease;
+}
+
+.special-section.animate {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.special-section h3 {
+  text-align: center;
+  margin-bottom: 2rem;
+  font-size: 1.8rem;
+  font-weight: 600;
+}
+
+/* ===== GRILLE DE CARTES CULTURELLES (FLIP CARDS) ===== */
+.culture-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin: 2rem 0;
+  perspective: 1000px;
+}
+
+.culture-card {
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+  transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+  opacity: 0;
+  transform: translateY(20px);
+  transform-style: preserve-3d;
+  position: relative;
+  height: 350px;
+  cursor: pointer;
+}
+
+.culture-card.animate {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.culture-card:hover:not(.is-flipped) {
+  transform: translateY(-10px) rotateY(15deg);
+  box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+}
+
+.culture-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  transition: transform 0.8s;
+  transform-style: preserve-3d;
+}
+
+.culture-card.is-flipped .culture-card-inner {
+  transform: rotateY(180deg);
+}
+
+.culture-card-face {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1.5rem;
+  border-radius: 15px;
+  justify-content: center;
+}
+
+.culture-card-front {
+  background: white;
+  justify-content: flex-start;
+}
+
+.culture-card-front img {
+  width: 100%;
+  aspect-ratio: 16/9;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.culture-card-front .culture-card-content {
+  padding: 1.5rem;
+  text-align: center;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.culture-card-back {
+  background: #f8f9fa;
+  transform: rotateY(180deg);
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  text-align: center;
+}
+
+.culture-card-back p {
+  font-size: 1rem;
+  color: #555;
+  line-height: 1.6;
+  margin: 0;
+  opacity: 0;
+  transition: opacity 0.4s ease-in-out 0.4s;
+}
+
+.culture-card.is-flipped .culture-card-back p {
+  opacity: 1;
+}
+
+.culture-card h3 {
+  margin: 0 0 1rem;
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+/* Effets de retournement */
+.culture-card.effect-glow.is-flipped {
+  box-shadow: 0 10px 40px rgba(255, 215, 0, 0.7);
+}
+
+@keyframes multi-flip {
+  from { transform: rotateY(0); }
+  to { transform: rotateY(540deg); }
+}
+
+.effect-multi-flip .culture-card-inner {
+  transition: none;
+}
+
+.culture-card.effect-multi-flip.is-flipped .culture-card-inner {
+  animation: multi-flip 0.8s ease-in-out forwards;
+}
+
+/* ===== GALERIE PHOTO INFINIE ===== */
+.carousel-wrapper {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(to right, transparent, black 20%, black 80%, transparent);
+  mask-image: linear-gradient(to right, transparent, black 20%, black 80%, transparent);
+}
+
+.image-gallery-grid {
+  display: flex;
+  width: max-content;
+  margin: 0;
+}
+
+.image-gallery-grid.is-scrolling {
+  animation: infinite-scroll var(--scroll-duration, 60s) linear infinite;
+}
+
+@keyframes infinite-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+.gallery-item {
+  flex: 0 0 auto;
+  width: 300px;
+  padding: 0 10px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 10px;
+  transition: transform 0.3s ease;
+}
+
+.gallery-item:hover {
+  transform: scale(1.05);
+  z-index: 5;
+}
+
+.gallery-item img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  display: block;
+  border-radius: 10px;
+  transition: transform 0.4s ease;
+}
+
+.gallery-item:hover img {
+  transform: scale(1.1);
+}
+
+.gallery-caption {
+  position: absolute;
+  bottom: 0;
+  left: 10px;
+  right: 10px;
+  background: rgba(0,0,0,0.7);
+  color: white;
+  padding: 0.8rem;
+  font-size: 0.9rem;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  border-radius: 0 0 8px 8px;
+}
+
+.gallery-item:hover .gallery-caption {
+  opacity: 1;
+}
+
+/* ===== DASHBOARD & GRILLES D'INFO GÉNÉRIQUES ===== */
+.dashboard-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  margin: 3rem 0;
+}
+
+.dashboard-card {
+  background: white;
+  border-radius: 15px;
+  padding: 1.5rem;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.6s ease;
+}
+
+.dashboard-card.animate {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.dashboard-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  line-height: 1;
+}
+
+.dashboard-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.dashboard-card > p {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 1rem;
+}
+
+/* Grille d'info générique */
+.info-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  width: 100%;
+}
+
+.info-item {
+  background: #f8f9fa;
+  padding: 0.8rem;
+  border-radius: 8px;
+  text-align: left;
+}
+
+.info-item h4 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin: 0;
+  color: #555;
+}
+
+.info-item p {
+  font-size: 0.8rem;
+  margin: 0.2rem 0 0;
+  color: #777;
+}
+
+/* Styles spécifiques pour la carte biodiversité */
+.biodiversity-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.biodiversity-stat {
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+.biodiversity-stat .number {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.biodiversity-stat .label {
+  font-size: 0.8rem;
+}
+
+.emblematic-places {
+  width: 100%;
+  text-align: left;
+}
+
+.emblematic-places h4 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #555;
+  margin-bottom: 0.5rem;
+}
+
+.emblematic-places ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.emblematic-places li {
+  font-size: 0.85rem;
+  color: #777;
+  padding: 0.2rem 0;
+}
+
+/* ===== STATS (Afrique) ===== */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin: 3rem 0;
+}
+
+.stat-card {
+  background: rgba(255,255,255,0.9);
+  padding: 1.5rem;
+  border-radius: 10px;
+  text-align: center;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.6s ease;
+}
+
+.stat-card.animate {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.stat-number {
+  font-size: 2rem;
+  font-weight: 600;
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+/* ===== FOOTER ===== */
+footer {
+  background: rgba(0,0,0,0.8);
+  color: white;
+  text-align: center;
+  padding: 1.5rem;
+  margin-top: 3rem;
+}
+
+footer p {
+  margin: 0;
+  font-size: 1rem;
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+@media (max-width: 900px) {
+  
+}
+
+@media (max-width: 768px) {
+  .hero h2 { font-size: 2.2rem; }
+  .hero p { font-size: 1rem; }
+  .culture-grid { grid-template-columns: 1fr; gap: 1.5rem; }
+  .container { padding: 0 0.5rem; }
+  .special-section { padding: 1.5rem; }
+}
+
+@media (max-width: 480px) {
+  .hero h2 { font-size: 1.8rem; }
+  .dashboard-grid { grid-template-columns: 1fr; }
+}
+
+/* ===== QUIZ STYLES ===== */
+.quiz-section {
+  background: white;
+  border-top: 5px solid; /* La couleur sera définie par le thème */
+}
+
+.quiz-question {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #eee;
+}
+
+.quiz-question:last-of-type {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.quiz-question p {
+  font-weight: 600;
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+}
+
+.quiz-question label {
+  display: block;
+  margin-bottom: 0.5rem;
+  padding: 0.8rem;
+  border-radius: 8px;
+  background-color: #f8f9fa;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+  border: 1px solid transparent;
+}
+
+.quiz-question label:hover {
+  background-color: #e9ecef;
+  transform: translateY(-2px);
+}
+
+.quiz-question input[type="radio"] {
+  margin-right: 10px;
+}
+
+.quiz-submit-btn {
+  display: block;
+  width: 100%;
+  padding: 1rem;
+  background-color: #333; /* Couleur par défaut */
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  margin-top: 2rem;
+}
+
+.quiz-retry-btn {
+  display: inline-block;
+  padding: 0.8rem 1.5rem;
+  background-color: #555;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  margin-top: 1rem;
+}
+
+.quiz-retry-btn:hover {
+  background-color: #333;
+}
+
+.quiz-results {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  border-radius: 8px;
+  background-color: #f8f9fa;
+  display: none;
+  text-align: center;
+}
+
+.quiz-results h4 {
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+}
+
+.quiz-results p {
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.quiz-question label.correct {
+  background-color: #d4edda;
+  border-color: #c3e6cb;
+  font-weight: bold;
+}
+
+.quiz-question label.incorrect {
+  background-color: #f8d7da;
+  border-color: #f5c6cb;
+  opacity: 0.7;
+}
+
+/* ===== COULEURS SPÉCIFIQUES PAR CONTINENT ===== */
+/* Afrique */
+.afrique-theme { background: linear-gradient(135deg, #ff6b35, #f7931e); }
+.afrique-theme .culture-card h3,
+.afrique-theme .dashboard-title,
+.afrique-theme .stat-number,
+.afrique-theme .biodiversity-stat .number,
+.afrique-theme .info-item h4 { color: #ff6b35; }
+.afrique-theme .quiz-section { border-top-color: #ff6b35; }
+.afrique-theme .quiz-submit-btn { background-color: #ff6b35; }
+.afrique-theme .quiz-submit-btn:hover { background-color: #e05a2e; }
+
+/* Europe */
+.europe-theme { background: linear-gradient(135deg, #667eea, #764ba2); }
+.europe-theme .culture-card h3,
+.europe-theme .dashboard-title,
+.europe-theme .info-item h4 { color: #667eea; }
+.europe-theme .quiz-section { border-top-color: #667eea; }
+.europe-theme .quiz-submit-btn { background-color: #667eea; }
+.europe-theme .quiz-submit-btn:hover { background-color: #5a6fd8; }
+
+
+/* Asie */
+.asie-theme { background: linear-gradient(135deg, #ff9a9e, #fecfef); }
+.asie-theme .culture-card h3,
+.asie-theme .dashboard-title,
+.asie-theme .info-item h4 { color: #ff6b9d; }
+.asie-theme .quiz-section { border-top-color: #ff6b9d; }
+.asie-theme .quiz-submit-btn { background-color: #ff6b9d; }
+.asie-theme .quiz-submit-btn:hover { background-color: #fa5a8d; }
+
+/* Amériques */
+.ameriques-theme { background: linear-gradient(135deg, #ff6b6b, #4ecdc4); }
+.ameriques-theme .culture-card h3,
+.ameriques-theme .dashboard-title,
+.ameriques-theme .info-item h4 { color: #ff6b6b; }
+.ameriques-theme .quiz-section { border-top-color: #ff6b6b; }
+.ameriques-theme .quiz-submit-btn { background-color: #ff6b6b; }
+.ameriques-theme .quiz-submit-btn:hover { background-color: #e85a5a; }
+
+/* Océanie */
+.oceanie-theme { background: linear-gradient(135deg, #74b9ff, #0984e3); }
+.oceanie-theme .culture-card h3,
+.oceanie-theme .dashboard-title,
+.oceanie-theme .info-item h4 { color: #74b9ff; }
+.oceanie-theme .quiz-section { border-top-color: #74b9ff; }
+.oceanie-theme .quiz-submit-btn { background-color: #74b9ff; }
+.oceanie-theme .quiz-submit-btn:hover { background-color: #63a4e8; }

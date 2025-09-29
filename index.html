@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Un Monde Sans Frontières - Accueil</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    html {
+      scroll-behavior: smooth;
+    }
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: #f5f5f5; /* Original light grey background */
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      overflow-x: hidden;
+    }
+    header {
+      background: linear-gradient(90deg, #ff6f61, #ffcc70);
+      color: white;
+      width: 100%;
+      padding: 2rem;
+      position: relative;
+      z-index: 2;
+    }
+    header h1 {
+      margin: 0 0 0.5rem;
+      font-size: 2rem;
+    }
+    header p {
+      margin: 0 0 1rem;
+    }
+    nav a {
+      margin: 0 0.5rem;
+      padding: 0.5rem 1rem;
+      text-decoration: none;
+      font-weight: 600;
+      color: white;
+      border-radius: 20px;
+      transition: background-color 0.3s;
+    }
+    nav a:hover {
+      background-color: rgba(255,255,255,0.2);
+    }
+    .intro-image {
+      width: 150px;
+      height: 150px;
+      margin: 1rem auto 0;
+      border-radius: 50%;
+      background: url('https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Globe_icon.svg/1024px-Globe_icon.svg.png') center/cover no-repeat;
+      animation: spin 20s linear infinite;
+    }
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    .floating-layer {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+      overflow: hidden;
+    }
+    .float-item {
+      position: absolute;
+      opacity: 0;
+      will-change: transform, opacity;
+      filter: drop-shadow(0 6px 12px rgba(0,0,0,0.15));
+      animation: floatUp var(--dur, 14s) linear var(--delay, 0s) infinite;
+    }
+    .float-item img {
+      display: block;
+      width: var(--size, 80px);
+      height: auto;
+      border-radius: 10px;
+      object-fit: cover;
+    }
+    @keyframes floatUp {
+      0% {
+        transform: translate(var(--x, 0), 20vh) scale(0.95) rotate(var(--rotStart, -4deg));
+        opacity: 0;
+      }
+      10% { opacity: 1; }
+      50% {
+        transform: translate(calc(var(--x, 0) + var(--drift, 40px)), -10vh) scale(1) rotate(0deg);
+      }
+      90% { opacity: 1; }
+      100% {
+        transform: translate(calc(var(--x, 0) + var(--drift, 40px)), -40vh) scale(1.05) rotate(var(--rotEnd, 6deg));
+        opacity: 0;
+      }
+    }
+    
+    .overview-section {
+        background: white;
+        width: 100%;
+        padding: 4rem 2rem;
+        position: relative;
+        z-index: 2;
+    }
+    .overview-section h2 {
+        font-size: 2.5rem;
+        margin-bottom: 3rem;
+    }
+    .overview-item {
+        display: flex;
+        align-items: center;
+        gap: 3rem;
+        margin-bottom: 4rem;
+        opacity: 0;
+        transform: translateX(-100px); /* Default start from left */
+        transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    .overview-item:nth-child(odd) {
+        flex-direction: row-reverse;
+        transform: translateX(100px); /* Odd items start from right */
+    }
+    /* This rule must come AFTER the initial state rules to override the transform */
+    .overview-item.animate {
+        opacity: 1;
+        transform: translateX(0); /* Animate to final position */
+    }
+    .overview-image {
+        flex: 1;
+        max-width: 500px;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    }
+    .overview-image img {
+        width: 100%;
+        display: block;
+    }
+    .overview-content {
+        flex: 1;
+        text-align: left;
+    }
+    .overview-content h3 {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+    }
+    .overview-content p {
+        margin-bottom: 1.5rem;
+        font-size: 1.1rem;
+        color: #555;
+    }
+    .overview-content .btn {
+        background: #ff6f61;
+        color: white;
+        padding: 0.8rem 1.5rem;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: background-color 0.3s;
+        display: inline-block;
+    }
+    .overview-content .btn:hover {
+        background: #e65a4d;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .float-item, .intro-image { animation: none; }
+    }
+    footer {
+      margin-top: 0;
+      padding: 1rem;
+      background: #333;
+      color: white;
+      width: 100%;
+      position: relative;
+      z-index: 2;
+    }
+    @media(max-width:900px){
+        .overview-item, .overview-item:nth-child(odd) {
+            flex-direction: column;
+            text-align: center;
+        }
+        .overview-content {
+            text-align: center;
+        }
+    }
+    @media(max-width:768px){
+      header h1 { font-size: 1.8rem; }
+      header p { font-size: 1rem; }
+      nav a { margin: 0.2rem; font-size: 0.9rem; }
+    }
+  </style>
+</head>
+<body class="">
+
+  <header>
+    <h1>🌍 Un Monde Sans Frontières</h1>
+    <p>Découvrons les cultures qui nous unissent</p>
+    <div class="intro-image"></div>
+    <nav>
+      <a href="index.html">Accueil 🏠</a>
+      <a href="afrique.html">Afrique 🌍</a>
+      <a href="europe.html">Europe 🎶</a>
+      <a href="asie.html">Asie 🏯</a>
+      <a href="ameriques.html">Amériques 🎤</a>
+      <a href="oceanie.html">Océanie 🏝️</a>
+      <a href="harmonie.html">Harmonie 🤝</a>
+    </nav>
+  </header>
+
+  <!-- Couche d'images flottantes -->
+  <div class="floating-layer" aria-hidden="true" id="floatingLayer"></div>
+
+  <section class="overview-section">
+    <h2>Aperçu des Continents</h2>
+
+    <!-- Afrique 1 -->
+    <div class="overview-item special-section">
+      <div class="overview-image">
+        <img src="images/plat de riz jollof africain.png" alt="Plat de riz Jollof africain">
+      </div>
+      <div class="overview-content">
+        <h3>Afrique - Le Goût du Partage</h3>
+        <p>Le Jollof Rice, plat emblématique d'Afrique de l'Ouest, est plus qu'une recette : c'est un symbole de fête, de compétition amicale et d'identité culturelle.</p>
+        <a href="afrique.html#culture-cuisine" class="btn">Découvrir la cuisine <i class="fa-solid fa-arrow-right"></i></a>
+      </div>
+    </div>
+
+    <!-- Afrique 2 -->
+    <div class="overview-item special-section">
+      <div class="overview-image">
+        <img src="images/Grio racontant une histoire a des enfants.png" alt="Un griot conte une histoire à des enfants">
+      </div>
+      <div class="overview-content">
+        <h3>Afrique - La Voix des Ancêtres</h3>
+        <p>Le Griot est un poète, musicien et historien, dépositaire de la tradition orale. Il est la mémoire vivante qui transmet la sagesse et les récits de tout un peuple.</p>
+        <a href="afrique.html#culture-griot" class="btn">Écouter les griots <i class="fa-solid fa-arrow-right"></i></a>
+      </div>
+    </div>
+
+    <!-- Europe 1 -->
+    <div class="overview-item special-section">
+      <div class="overview-image">
+        <img src="images/le Flamenco.png" alt="Danseurs de Flamenco">
+      </div>
+      <div class="overview-content">
+        <h3>Europe - La Passion du Flamenco</h3>
+        <p>Né en Andalousie, le Flamenco est un art puissant qui exprime les joies et les peines de la vie à travers le chant, la guitare et une danse passionnée.</p>
+        <a href="europe.html#culture-danse" class="btn">Explorer la danse <i class="fa-solid fa-arrow-right"></i></a>
+      </div>
+    </div>
+
+    <!-- Europe 2 -->
+    <div class="overview-item special-section">
+      <div class="overview-image">
+        <img src="images/chambord.png" alt="Le château de Chambord en France">
+      </div>
+      <div class="overview-content">
+        <h3>Europe - L'Élégance des Châteaux</h3>
+        <p>Témoins de l'histoire, les châteaux européens racontent des siècles de pouvoir, d'art et d'architecture, du Moyen Âge à la Renaissance.</p>
+        <a href="europe.html#culture-chateaux" class="btn">Visiter les châteaux <i class="fa-solid fa-arrow-right"></i></a>
+      </div>
+    </div>
+
+    <!-- Asie 1 -->
+    <div class="overview-item special-section">
+      <div class="overview-image">
+        <img src="images/La cérémonie du thé japonaise, ou Chanoy.png" alt="Cérémonie du thé japonaise">
+      </div>
+      <div class="overview-content">
+        <h3>Asie - L'Harmonie du Thé</h3>
+        <p>La cérémonie du thé japonaise, ou "Chanoyu", est un art ancestral qui transforme une simple boisson en un moment de paix, de respect et de spiritualité.</p>
+        <a href="asie.html#culture-tradition" class="btn">Vivre la tradition <i class="fa-solid fa-arrow-right"></i></a>
+      </div>
+    </div>
+
+    <!-- Asie 2 -->
+    <div class="overview-item special-section">
+      <div class="overview-image">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/The_Great_Wall_of_China_at_Jinshanling-edit.jpg/1280px-The_Great_Wall_of_China_at_Jinshanling-edit.jpg" alt="La Grande Muraille de Chine">
+      </div>
+      <div class="overview-content">
+        <h3>Asie - La Majesté de la Grande Muraille</h3>
+        <p>Serpentant à travers les montagnes, cette fortification légendaire est l'une des constructions humaines les plus impressionnantes, un symbole de persévérance.</p>
+        <a href="asie.html#culture-architecture-muraille" class="btn">Parcourir la muraille <i class="fa-solid fa-arrow-right"></i></a>
+      </div>
+    </div>
+
+    <!-- Amériques 1 -->
+    <div class="overview-item special-section">
+      <div class="overview-image">
+        <img src="images/Jazz.png" alt="Musiciens de Jazz">
+      </div>
+      <div class="overview-content">
+        <h3>Amériques - L'Âme du Jazz</h3>
+        <p>Né à la Nouvelle-Orléans, le jazz est une révolution musicale fondée sur l'improvisation et la liberté d'expression, un véritable symbole de la créativité américaine.</p>
+        <a href="ameriques.html#culture-musique" class="btn">Écouter l'Amérique <i class="fa-solid fa-arrow-right"></i></a>
+      </div>
+    </div>
+
+    <!-- Amériques 2 -->
+    <div class="overview-item special-section">
+      <div class="overview-image">
+        <img src="images/danseuse de samba en costume extravagant lors du carnaval de rio.png" alt="Danseuse de samba en costume extravagant lors du Carnaval de Rio.">
+      </div>
+      <div class="overview-content">
+        <h3>Amériques - La Folie du Carnaval</h3>
+        <p>Le Carnaval de Rio est une célébration exubérante de la culture brésilienne. Une explosion de couleurs, de musique et de joie qui attire des millions de visiteurs.</p>
+        <a href="ameriques.html#culture-carnaval" class="btn">Rejoindre la fête <i class="fa-solid fa-arrow-right"></i></a>
+      </div>
+    </div>
+
+    <!-- Océanie 1 -->
+    <div class="overview-item special-section">
+      <div class="overview-image">
+        <img src="images/En Polynésie, le tatouage est bien plus qu'un ornement.png" alt="Tatouage polynésien">
+      </div>
+      <div class="overview-content">
+        <h3>Océanie - L'Art du Tatouage</h3>
+        <p>En Polynésie, le tatouage est bien plus qu'un ornement. C'est une carte d'identité qui raconte l'histoire, le rang social et la spiritualité d'une personne.</p>
+        <a href="oceanie.html#culture-art" class="btn">Lire sur la peau <i class="fa-solid fa-arrow-right"></i></a>
+      </div>
+    </div>
+
+    <!-- Océanie 2 -->
+    <div class="overview-item special-section">
+      <div class="overview-image">
+        <img src="images/ecosystème d'australie.png" alt="Vue aérienne de la Grande Barrière de Corail en Australie.">
+      </div>
+      <div class="overview-content">
+        <h3>Océanie - Le Trésor de Corail</h3>
+        <p>La Grande Barrière de Corail est le plus grand écosystème vivant de la planète. Un monde sous-marin d'une beauté fragile et d'une biodiversité exceptionnelle.</p>
+        <a href="oceanie.html#culture-nature-corail" class="btn">Plonger dans le récif <i class="fa-solid fa-arrow-right"></i></a>
+      </div>
+    </div>
+
+  </section>
+
+  <footer>
+    <p>IAI WebJam 2025</p>
+  </footer>
+
+  <script>
+    (function(){
+      const layer = document.getElementById('floatingLayer');
+      if (!layer) return;
+      const images = [
+        'images/Musique - Djembé.png',
+        'images/pizza.png',
+        'images/thé japonais.png',
+        'images/tatoullage un peux festive.png',
+        'images/flamenco en un peu plus festife.png',
+        'images/Jazz.png'
+      ];
+
+      const vw = () => Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+      const vh = () => Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+
+      const rand = (min, max) => Math.random() * (max - min) + min;
+
+      function spawnFloatItem(){
+        const el = document.createElement('div');
+        el.className = 'float-item';
+        const img = document.createElement('img');
+        img.src = images[Math.floor(Math.random() * images.length)];
+        img.alt = '';
+        const size = rand(60, 110);
+        const startX = rand(0, vw());
+        const drift = rand(-80, 80) + 'px';
+        const delay = rand(0, 8) + 's';
+        const dur = rand(12, 22) + 's';
+        const rotStart = rand(-8, -2) + 'deg';
+        const rotEnd = rand(2, 10) + 'deg';
+
+        el.style.setProperty('--size', size + 'px');
+        el.style.setProperty('--x', startX + 'px');
+        el.style.setProperty('--drift', drift);
+        el.style.setProperty('--delay', delay);
+        el.style.setProperty('--dur', dur);
+        el.style.setProperty('--rotStart', rotStart);
+        el.style.setProperty('--rotEnd', rotEnd);
+
+        el.appendChild(img);
+        layer.appendChild(el);
+
+        const removeAfter = parseFloat(dur) * 1000 + parseFloat(delay) * 1000 + 500;
+        setTimeout(() => {
+          if (el.parentNode) el.parentNode.removeChild(el);
+        }, removeAfter);
+      }
+
+      let running = true;
+      function loop(){
+        if (!running) return;
+        const batch = Math.random() < 0.5 ? 1 : 2;
+        for (let i = 0; i < batch; i++) spawnFloatItem();
+        setTimeout(loop, 1000);
+      }
+
+      window.addEventListener('load', () => {
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          running = false;
+          return;
+        }
+        for (let i = 0; i < 6; i++) spawnFloatItem();
+        loop();
+      });
+
+      document.addEventListener('visibilitychange', () => {
+        running = !document.hidden;
+        if (running && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) loop();
+      });
+
+    })();
+  </script>
+  <script src="animations.js" defer></script>
+</body>
+</html>
