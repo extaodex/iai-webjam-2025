@@ -1,0 +1,2329 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0a0d24">
+<title>🎬 Cinématique — Toby (Tle)</title>
+<style>
+:root{
+  --c1:#3fd8ff; --c2:#ffd166; --c3:#ff5f8f; --c4:#3ddc97;
+  --card:rgba(255,255,255,.06); --line:rgba(255,255,255,.12);
+  --txt:#e9edff; --dim:#98a1d4; --ok:#3ddc97; --ko:#ff5f8f;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
+html{font-size:16px}
+body{
+  min-height:100vh;min-height:100dvh;background:#04050d;color:var(--txt);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  display:flex;align-items:center;justify-content:center;overflow:hidden;
+  user-select:none;-webkit-user-select:none;touch-action:manipulation;
+}
+#app{
+  position:relative;overflow:hidden;
+  width:min(100vw,calc(100vh * 9 / 16));
+  height:min(100vh,calc(100vw * 16 / 9));
+  width:min(100vw,calc(100dvh * 9 / 16));
+  height:min(100dvh,calc(100vw * 16 / 9));
+  background:radial-gradient(130% 75% at 50% -10%,#232a6b 0%,#12163a 45%,#0a0d24 75%,#07091a 100%);
+  box-shadow:0 0 0 1px rgba(255,255,255,.07),0 25px 70px rgba(0,0,0,.8);
+}
+/* ---------- écrans ---------- */
+.screen{position:absolute;inset:0;display:none;flex-direction:column;
+  padding:max(.9rem,env(safe-area-inset-top)) 1.1rem max(.9rem,env(safe-area-inset-bottom));}
+.screen.active{display:flex;animation:fadeIn .28s ease both}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.scroll{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;
+  scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.25) transparent;padding-right:.15rem;}
+.scroll::-webkit-scrollbar{width:4px}
+.scroll::-webkit-scrollbar-thumb{background:rgba(255,255,255,.22);border-radius:4px}
+/* ---------- barres du haut ---------- */
+.top{display:flex;align-items:center;gap:.7rem;padding-bottom:.8rem;flex:0 0 auto}
+.top .ttl{font-weight:800;font-size:1.12rem;letter-spacing:.2px;flex:1;min-width:0;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.iconbtn{width:2.5rem;height:2.5rem;border-radius:.8rem;border:1px solid var(--line);
+  background:var(--card);color:var(--txt);font-size:1.15rem;display:flex;align-items:center;
+  justify-content:center;cursor:pointer;flex:0 0 auto}
+.iconbtn:active{transform:scale(.92)}
+.hearts{font-size:1.05rem;letter-spacing:2px;white-space:nowrap}
+.prog{font-size:.82rem;color:var(--dim);font-weight:700;white-space:nowrap}
+/* ---------- boutons ---------- */
+.btn{display:flex;align-items:center;justify-content:center;gap:.5rem;width:100%;
+  min-height:3.1rem;padding:.8rem 1rem;border-radius:1.1rem;border:1px solid var(--line);
+  background:var(--card);color:var(--txt);font-size:1rem;font-weight:700;cursor:pointer;
+  font-family:inherit;line-height:1.25;text-align:center;transition:transform .1s}
+.btn:active{transform:scale(.97)}
+.btn.big{min-height:3.6rem;font-size:1.12rem;background:linear-gradient(135deg,#2f7fff,#3fd8ff);
+  color:#04121f;border:none;box-shadow:0 8px 24px rgba(63,216,255,.28)}
+.btn.ok{background:linear-gradient(135deg,#22c97e,#3ddc97);color:#04211a;border:none;
+  box-shadow:0 8px 22px rgba(61,220,151,.25)}
+.btn.ghost{background:rgba(255,255,255,.04)}
+.btn.danger{background:rgba(255,95,143,.14);border-color:rgba(255,95,143,.4);color:#ffb9cf}
+.btn:disabled{opacity:.45;pointer-events:none}
+.stack{display:flex;flex-direction:column;gap:.7rem;flex:0 0 auto}
+/* ---------- accueil ---------- */
+.home{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:.9rem;text-align:center;overflow-y:auto;min-height:0}
+.logo{width:5.6rem;height:5.6rem;border-radius:1.7rem;display:flex;align-items:center;
+  justify-content:center;font-size:3rem;background:linear-gradient(140deg,rgba(63,216,255,.22),rgba(255,95,143,.2));
+  border:1px solid rgba(63,216,255,.4);box-shadow:0 12px 40px rgba(63,216,255,.2);margin-top:.4rem}
+h1{font-size:2.5rem;font-weight:900;letter-spacing:-1px;
+  background:linear-gradient(90deg,#3fd8ff,#ffd166 55%,#ff5f8f);-webkit-background-clip:text;
+  background-clip:text;color:transparent}
+.sub{color:var(--dim);font-size:.92rem;font-weight:600;margin-top:-.45rem}
+.bouncer{height:4.4rem;position:relative;width:100%;pointer-events:none}
+.ball{position:absolute;left:calc(50% - 1.1rem);bottom:0;width:2.2rem;height:2.2rem;border-radius:50%;
+  background:radial-gradient(circle at 32% 30%,#ff9fb4,#ff5f8f 60%,#c92757);
+  box-shadow:0 6px 14px rgba(255,95,143,.4);animation:bnc 1.15s infinite}
+.ball::after{content:'';position:absolute;left:8%;right:8%;top:calc(50% - 1px);height:2px;
+  background:rgba(0,0,0,.28);border-radius:2px;transform:rotate(-24deg)}
+@keyframes bnc{
+  0%{transform:translateY(0) scaleY(.85) scaleX(1.1);animation-timing-function:ease-out}
+  18%{transform:translateY(-1.5rem) scaleY(1.05) scaleX(.97);animation-timing-function:linear}
+  50%{transform:translateY(-3.5rem);animation-timing-function:ease-in}
+  92%{transform:translateY(0) scaleY(.85) scaleX(1.1);animation-timing-function:ease-out}
+  100%{transform:translateY(0) scaleY(.85) scaleX(1.1)}}
+.statline{font-size:.9rem;color:var(--dim);font-weight:600}
+.statline b{color:var(--c2)}
+.tip{font-size:.8rem;color:var(--dim);text-align:center;line-height:1.5;
+  background:var(--card);border:1px solid var(--line);border-radius:.9rem;padding:.6rem .8rem}
+/* ---------- cartes de cours ---------- */
+.card{background:var(--card);border:1px solid var(--line);border-radius:1.1rem;
+  padding:.9rem 1rem;margin-bottom:.75rem}
+.ct{font-weight:800;font-size:1.02rem;margin-bottom:.35rem;color:#fff}
+.card p{font-size:.92rem;line-height:1.55;color:#d7dcff}
+.card p b{color:var(--c1)}
+.f{display:block;background:#070a1e;border:1px solid rgba(63,216,255,.35);color:#c9f4ff;
+  border-radius:.7rem;padding:.5rem .6rem;margin-top:.55rem;text-align:center;
+  font-family:Georgia,"Times New Roman",serif;font-size:1.02rem;line-height:1.5}
+.f:last-child{margin-bottom:0}
+.sec{margin-bottom:1.3rem}
+.sec h2{font-size:1.1rem;font-weight:900;margin:.4rem 0 .7rem;display:flex;align-items:center;gap:.55rem}
+.sec h2 .si{font-size:1.35rem}
+.sec h2 span.n{margin-left:auto;font-size:.72rem;color:var(--dim);font-weight:700}
+.lead{font-size:.86rem;color:var(--dim);line-height:1.5;margin-bottom:1rem}
+/* ---------- carte leçon ---------- */
+.lessonhead{display:flex;align-items:center;gap:.8rem;margin-bottom:.8rem}
+.lessonhead .ic{font-size:2rem;background:var(--card);border:1px solid var(--line);
+  border-radius:1rem;width:3.4rem;height:3.4rem;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.lessonhead .tt{font-weight:900;font-size:1.2rem;line-height:1.2}
+.lessonhead .tg{font-size:.75rem;color:var(--c1);font-weight:800;letter-spacing:1px;text-transform:uppercase}
+/* ---------- jeu ---------- */
+.hud{display:flex;align-items:center;gap:.6rem;padding-bottom:.6rem;flex:0 0 auto}
+.cvwrap{width:100%;border-radius:1rem;overflow:hidden;background:rgba(4,6,20,.55);
+  border:1px solid var(--line);flex:0 0 auto;position:relative}
+.cv{display:block;width:100%;height:100%}
+.qtext{font-size:1rem;font-weight:700;line-height:1.45;margin:.85rem 0 .6rem;flex:0 0 auto}
+.qtext i{color:var(--dim);font-weight:600;font-style:normal;font-size:.88rem}
+.opts{display:flex;flex-direction:column;gap:.55rem;flex:0 0 auto}
+.opt{min-height:3rem;padding:.7rem .9rem;border-radius:1rem;border:1px solid var(--line);
+  background:var(--card);color:var(--txt);font-size:.98rem;font-weight:700;text-align:left;
+  cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:.6rem;line-height:1.3;
+  transition:transform .1s}
+.opt:active{transform:scale(.98)}
+.opt .k{width:1.7rem;height:1.7rem;border-radius:.55rem;background:rgba(255,255,255,.1);
+  display:flex;align-items:center;justify-content:center;font-size:.85rem;flex:0 0 auto}
+.opt.good{background:rgba(61,220,151,.18);border-color:var(--ok);color:#c8ffe9}
+.opt.bad{background:rgba(255,95,143,.16);border-color:var(--ko);color:#ffd0dd}
+.opt:disabled{pointer-events:none;opacity:.9}
+.fb{min-height:0;max-height:0;overflow:hidden;border-radius:1rem;font-size:.9rem;font-weight:600;
+  line-height:1.45;transition:all .25s;flex:0 0 auto}
+.fb.show{max-height:12rem;padding:.7rem .9rem;margin-top:.7rem;overflow-y:auto}
+.fb.ok{background:rgba(61,220,151,.15);border:1px solid rgba(61,220,151,.5);color:#c1ffe8}
+.fb.ko{background:rgba(255,95,143,.14);border:1px solid rgba(255,95,143,.5);color:#ffc9d8}
+.fb.info{background:rgba(63,216,255,.12);border:1px solid rgba(63,216,255,.45);color:#c9f4ff}
+/* sliders */
+.sl{display:flex;align-items:center;gap:.6rem;margin-top:.6rem;font-size:.86rem;font-weight:700}
+.sl label{width:8.2rem;flex:0 0 auto;line-height:1.2}
+.sl b{width:3.4rem;text-align:right;color:var(--c2);flex:0 0 auto;font-size:.92rem}
+.sl input[type=range]{flex:1;min-width:0;accent-color:#3fd8ff;height:1.6rem}
+.calc{background:#070a1e;border:1px solid rgba(255,209,102,.35);color:#ffe9b8;border-radius:.8rem;
+  padding:.55rem .7rem;margin-top:.7rem;font-family:Georgia,serif;font-size:.95rem;text-align:center;line-height:1.5}
+.numrow{display:flex;gap:.6rem;margin-top:.7rem;flex:0 0 auto}
+.numrow input{flex:1;min-width:0;min-height:3rem;border-radius:1rem;border:1px solid var(--line);
+  background:rgba(255,255,255,.07);color:#fff;font-size:1.15rem;font-weight:800;text-align:center;
+  font-family:inherit;outline:none;user-select:text;-webkit-user-select:text}
+.numrow input:focus{border-color:var(--c1)}
+.numrow .btn{width:auto;flex:0 0 auto;padding:.6rem 1.2rem}
+.unit{display:flex;align-items:center;font-weight:800;color:var(--dim);font-size:1rem}
+/* cartes de graphiques */
+.grids{display:flex;gap:.6rem;flex:0 0 auto}
+.gcard{flex:1;min-width:0;background:var(--card);border:1px solid var(--line);border-radius:1rem;
+  padding:.5rem .45rem .35rem;cursor:pointer;font-family:inherit;color:var(--txt);
+  display:flex;flex-direction:column;gap:.3rem;align-items:center;transition:transform .1s}
+.gcard:active{transform:scale(.97)}
+.gcard .gl{font-size:.8rem;font-weight:900;color:var(--dim);letter-spacing:1px}
+.gcard canvas{width:100%;height:6.2rem;display:block}
+.gcard.good{border-color:var(--ok);background:rgba(61,220,151,.15)}
+.gcard.good .gl{color:var(--ok)}
+.gcard.bad{border-color:var(--ko);background:rgba(255,95,143,.14)}
+.gcard.bad .gl{color:var(--ko)}
+.gcard:disabled{pointer-events:none;opacity:.85}
+/* quiz */
+.qcount{font-size:.78rem;color:var(--dim);font-weight:800;letter-spacing:.6px;text-transform:uppercase}
+.expl{background:rgba(63,216,255,.1);border:1px solid rgba(63,216,255,.35);border-radius:1rem;
+  padding:.75rem .9rem;font-size:.9rem;line-height:1.55;margin-top:.7rem;color:#d5f6ff;font-weight:600}
+.expl b{color:#fff}
+/* résultat */
+.result{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:.8rem;text-align:center;overflow-y:auto;min-height:0}
+.stars{font-size:2.6rem;letter-spacing:.35rem;filter:drop-shadow(0 6px 18px rgba(255,209,102,.35))}
+.stars .off{filter:none;opacity:.28}
+.rtitle{font-size:1.6rem;font-weight:900}
+.rtext{font-size:.94rem;color:var(--dim);line-height:1.55;max-width:20rem}
+.rscore{display:flex;gap:.6rem;justify-content:center;flex-wrap:wrap}
+.chip{background:var(--card);border:1px solid var(--line);border-radius:.8rem;padding:.5rem .8rem;
+  font-size:.85rem;font-weight:800}
+.chip b{color:var(--c2);font-size:1.05rem}
+/* carte des niveaux */
+.mapgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:.7rem;flex:0 0 auto}
+.tile{aspect-ratio:1/1.08;border-radius:1.2rem;border:1px solid var(--line);background:var(--card);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.15rem;
+  cursor:pointer;font-family:inherit;color:var(--txt);position:relative;transition:transform .12s}
+.tile:active{transform:scale(.95)}
+.tile .ic{font-size:1.9rem}
+.tile .nm{font-size:.66rem;font-weight:800;color:var(--dim);text-align:center;line-height:1.15;padding:0 .2rem}
+.tile .st{font-size:.72rem;letter-spacing:1px}
+.tile.locked{opacity:.4;filter:grayscale(.8)}
+.tile.done{border-color:rgba(61,220,151,.55);background:rgba(61,220,151,.1)}
+.tile.final{border-color:rgba(255,209,102,.55);background:rgba(255,209,102,.1)}
+.tile .lk{position:absolute;top:.35rem;right:.5rem;font-size:.8rem}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.tile.shake{animation:shake .25s}
+/* overlay */
+.ovl{position:absolute;inset:0;background:rgba(3,4,14,.86);backdrop-filter:blur(6px);
+  display:none;align-items:center;justify-content:center;padding:1.6rem;z-index:50}
+.ovl.show{display:flex;animation:fadeIn .2s both}
+.ovlbox{background:#141838;border:1px solid var(--line);border-radius:1.5rem;padding:1.4rem 1.2rem;
+  width:100%;max-width:22rem;text-align:center;display:flex;flex-direction:column;gap:.8rem}
+.ovlbox .big{font-size:2.6rem}
+.ovlbox h3{font-size:1.25rem;font-weight:900}
+.ovlbox p{font-size:.9rem;color:var(--dim);line-height:1.5}
+/* fiche */
+.fiche .card{border-color:rgba(255,209,102,.3)}
+.trap{background:rgba(255,95,143,.1);border:1px solid rgba(255,95,143,.35);color:#ffd3de;
+  border-radius:.7rem;padding:.5rem .7rem;margin-top:.5rem;font-size:.86rem;line-height:1.5;font-weight:600}
+/* divers */
+.divider{height:1px;background:var(--line);margin:.4rem 0}
+.muted{font-size:.78rem;color:var(--dim);text-align:center;line-height:1.45}
+.pill{display:inline-block;background:rgba(63,216,255,.14);border:1px solid rgba(63,216,255,.4);
+  color:#bff3ff;border-radius:99px;padding:.2rem .7rem;font-size:.78rem;font-weight:800}
+
+/* ============================================================
+   FUSION : module EXERCICES + CRÉDITS / CONTACT
+   ============================================================ */
+.brandline{margin-top:.1rem;font-size:.76rem;color:var(--dim);font-weight:700;line-height:1.5}
+.brandline b{color:var(--c1)}
+.exTier{display:flex;align-items:center;gap:.85rem;width:100%;text-align:left;font-family:inherit;
+  color:var(--txt);background:var(--card);border:1px solid var(--line);border-radius:1.15rem;
+  padding:.8rem .9rem;margin-bottom:.65rem;cursor:pointer;transition:transform .1s}
+.exTier:active{transform:scale(.98)}
+.exTier .dic{width:3rem;height:3rem;border-radius:.9rem;display:flex;align-items:center;justify-content:center;
+  font-size:1.55rem;flex:0 0 auto;background:rgba(255,255,255,.06)}
+.exTier .meta{flex:1;min-width:0}
+.exTier .nm{font-weight:900;font-size:1.02rem}
+.exTier .ds{font-size:.73rem;color:var(--dim);font-weight:700;line-height:1.3}
+.exTier .stars{font-size:.8rem;letter-spacing:1px;margin-top:.15rem}
+.exDots{display:flex;gap:.18rem;margin-top:.28rem}
+.exDots i{width:.55rem;height:.55rem;border-radius:99px;background:rgba(255,255,255,.16)}
+.exQ{background:var(--card);border:1px solid var(--line);border-radius:1.15rem;padding:.95rem 1rem;
+  font-size:.98rem;line-height:1.6;flex:0 0 auto}
+.exQ b{color:var(--c1)}
+.exNum{display:flex;gap:.6rem;margin-top:.85rem;flex:0 0 auto}
+.exNum input{flex:1;min-width:0;min-height:3.1rem;border-radius:1rem;border:1px solid var(--line);
+  background:rgba(255,255,255,.07);color:#fff;font-size:1.2rem;font-weight:800;text-align:center;
+  font-family:inherit;outline:none;user-select:text;-webkit-user-select:text}
+.exNum input:focus{border-color:var(--c1)}
+.exUnit{display:flex;align-items:center;font-weight:800;color:var(--dim);font-size:.95rem;white-space:nowrap}
+.exPanel{border-radius:1.1rem;padding:.8rem .95rem;font-size:.92rem;line-height:1.55;margin-top:.8rem;flex:0 0 auto}
+.exPanel h4{font-size:.98rem;margin-bottom:.35rem;font-weight:900}
+.exPanel.ok{background:rgba(61,220,151,.14);border:1px solid rgba(61,220,151,.5);color:#c9ffe9}
+.exPanel.ko{background:rgba(255,95,143,.13);border:1px solid rgba(255,95,143,.5);color:#ffd0dd}
+.exPanel b{color:#fff}
+.exSteps{margin:.4rem 0 0 1.05rem;display:flex;flex-direction:column;gap:.28rem}
+.exSteps li{line-height:1.5}
+.exSteps li:last-child{font-weight:800;color:#fff}
+.exHint{background:rgba(255,209,102,.1);border:1px dashed rgba(255,209,102,.5);border-radius:.9rem;
+  padding:.7rem .85rem;font-size:.88rem;line-height:1.5;color:#ffe9b8;margin-top:.8rem;flex:0 0 auto}
+.exHint b{color:#fff}
+.exChip{background:var(--card);border:1px solid var(--line);border-radius:.8rem;padding:.5rem .8rem;
+  font-size:.85rem;font-weight:800}
+.exChip b{color:var(--c2);font-size:1.05rem}
+.exRes{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.75rem;
+  text-align:center;overflow-y:auto;min-height:0}
+.exStars{font-size:2.5rem;letter-spacing:.3rem;filter:drop-shadow(0 6px 18px rgba(255,209,102,.35))}
+.rateFaces{display:flex;gap:.35rem;justify-content:center;margin:.5rem 0 .15rem}
+.rateFaces button{background:none;border:none;font-size:1.85rem;cursor:pointer;line-height:1;padding:.12rem;
+  filter:grayscale(1) opacity(.4);transform:scale(.9);transition:transform .16s,filter .16s}
+.rateFaces button.on{filter:none;transform:scale(1.12)}
+.rateFaces button:active{transform:scale(1.35)}
+.rateBig{font-size:4.3rem;line-height:1;text-align:center;margin:.1rem 0;transition:filter .3s}
+.rateBig.pop{animation:ratePop .5s cubic-bezier(.2,1.5,.45,1)}
+@keyframes ratePop{0%{transform:scale(.5) rotate(-10deg)}55%{transform:scale(1.28) rotate(6deg)}100%{transform:scale(1) rotate(0)}}
+.rateTxt{text-align:center;font-weight:800;font-size:.95rem}
+.rateTxt b{color:var(--c2)}
+.wishChips{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.45rem}
+.wishChips button{font-family:inherit;font-size:.82rem;font-weight:800;color:var(--txt);
+  background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:999px;
+  padding:.42rem .72rem;cursor:pointer;transition:transform .1s}
+.wishChips button.on{background:linear-gradient(135deg,#2f7fff,#3fd8ff);color:#04121f;border-color:transparent}
+.wishChips button:active{transform:scale(.94)}
+.fbField{display:flex;flex-direction:column;gap:.3rem;margin-bottom:.6rem;text-align:left}
+.fbField label{font-size:.8rem;font-weight:800;color:var(--dim)}
+.fbField input,.fbField select,.fbField textarea{font-family:inherit;font-size:.95rem;color:#fff;
+  background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:.8rem;padding:.6rem .7rem;
+  outline:none;user-select:text;-webkit-user-select:text;width:100%}
+.fbField textarea{min-height:5rem;resize:vertical}
+.fbField input:focus,.fbField select:focus,.fbField textarea:focus{border-color:var(--c1)}
+.fbField option{color:#111}
+.creditCard{background:var(--card);border:1px solid var(--line);border-radius:1.1rem;padding:.9rem 1rem;
+  margin-bottom:.75rem;text-align:left}
+.creditCard .ct{font-weight:800;font-size:1.02rem;margin-bottom:.35rem;color:#fff}
+.creditCard p{font-size:.9rem;line-height:1.55;color:#d7dcff}
+.creditCard p b{color:var(--c1)}
+.wabtn{background:linear-gradient(135deg,#25d366,#128c7e)!important;color:#fff!important;border:none!important;
+  box-shadow:0 8px 22px rgba(37,211,102,.25)!important}
+
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ACCUEIL -->
+  <section class="screen active" id="scr-home">
+    <div class="home">
+      <div class="logo">🎬</div>
+      <h1>Cinématique</h1>
+      <div class="sub">Le jeu complet · Spé Physique-Chimie · Tle</div>
+      <div class="bouncer"><div class="ball"></div></div>
+      <div class="statline" id="homeStats"></div>
+      <div class="statline" id="exHomeStats">🟢 Débutant · ⭐ 0/40 réussis · ✨ 0 XP</div>
+      <div class="stack" style="width:100%;max-width:22rem">
+        <button class="btn big" id="btnPlay">▶ Commencer l’aventure</button>
+        <button class="btn" id="btnCourse">📖 Cours complet</button>
+        <button class="btn" id="btnFiche">📋 Fiche de révision</button>
+        <button class="btn" id="btnExos">🎯 Exercices — 8 niveaux</button>
+        <div style="display:flex;gap:.7rem">
+          <button class="btn ghost" id="btnSound" style="flex:1">🔊 Son : on</button>
+          <button class="btn ghost" id="btnReset" style="flex:1">↺ Reset</button>
+        </div>
+        <button class="btn ghost" id="btnCredits">ℹ️ Crédits & contact</button>
+      </div>
+      <div class="tip">💡 <b>8 niveaux</b> — cours, défis interactifs, quiz et étoiles ⭐<br>Ouvre ce fichier sur ton téléphone pour réviser partout&nbsp;!</div>
+      <button class="brandline" id="exHomeBrand" style="background:none;border:none;font-family:inherit;cursor:pointer">✍️ Créé par <b>Toby</b> · 📱 <b>+228 71 25 46 00</b></button>
+    </div>
+  </section>
+
+  <!-- COURS COMPLET -->
+  <section class="screen" id="scr-course">
+    <div class="top">
+      <button class="iconbtn" data-go="scr-home">←</button>
+      <div class="ttl">📖 Cours complet de cinématique</div>
+    </div>
+    <div class="scroll" id="courseBody"></div>
+  </section>
+
+  <!-- FICHE -->
+  <section class="screen" id="scr-fiche">
+    <div class="top">
+      <button class="iconbtn" data-go="scr-home">←</button>
+      <div class="ttl">📋 Fiche de révision express</div>
+    </div>
+    <div class="scroll fiche" id="ficheBody"></div>
+  </section>
+
+  <!-- CARTE DES NIVEAUX -->
+  <section class="screen" id="scr-map">
+    <div class="top">
+      <button class="iconbtn" data-go="scr-home">←</button>
+      <div class="ttl">🗺️ Carte des niveaux</div>
+      <div class="prog" id="mapProg"></div>
+    </div>
+    <div class="scroll">
+      <div class="mapgrid" id="mapGrid"></div>
+      <div class="divider"></div>
+      <div class="stack" style="margin-top:.9rem">
+        <button class="btn" id="btnCourse2">📖 Cours complet</button>
+        <button class="btn" id="btnFiche2">📋 Fiche de révision</button>
+      </div>
+      <div class="muted" style="margin-top:.9rem">Termine un niveau pour débloquer le suivant ⭐ = ❤️ restants</div>
+    </div>
+  </section>
+
+  <!-- LEÇON -->
+  <section class="screen" id="scr-lesson">
+    <div class="top">
+      <button class="iconbtn" data-go="scr-map">←</button>
+      <div class="ttl" id="lesTtl"></div>
+      <div class="prog" id="lesNum"></div>
+    </div>
+    <div class="scroll" id="lesBody"></div>
+    <div class="stack" style="padding-top:.8rem">
+      <button class="btn big" id="btnToGame">🎮 Au défi !</button>
+    </div>
+  </section>
+
+  <!-- JEU -->
+  <section class="screen" id="scr-game">
+    <div class="hud">
+      <button class="iconbtn" id="gameQuit">✕</button>
+      <div class="ttl" id="gameTtl"></div>
+      <div class="hearts" id="gameHearts"></div>
+    </div>
+    <div class="scroll" id="gameBody" style="display:flex;flex-direction:column"></div>
+    <div class="fb" id="gameFb"></div>
+  </section>
+
+  <!-- QUIZ -->
+  <section class="screen" id="scr-quiz">
+    <div class="hud">
+      <button class="iconbtn" id="quizQuit">✕</button>
+      <div class="qcount" id="quizCount"></div>
+      <div class="hearts" id="quizHearts" style="margin-left:auto"></div>
+    </div>
+    <div class="scroll" id="quizBody" style="display:flex;flex-direction:column"></div>
+  </section>
+
+  <!-- RÉSULTAT -->
+  <section class="screen" id="scr-result">
+    <div class="result" id="resBody"></div>
+    <div class="stack" style="padding-top:.9rem" id="resBtns"></div>
+  </section>
+
+  <!-- DIPLÔME FINAL -->
+  <section class="screen" id="scr-final">
+    <div class="result" id="finBody"></div>
+    <div class="stack" style="padding-top:.9rem" id="finBtns"></div>
+  </section>
+
+  <!-- EXERCICES : CHOIX DE LA DIFFICULTÉ -->
+  <section class="screen" id="scr-tiers">
+    <div class="top">
+      <button class="iconbtn" data-go="scr-home">←</button>
+      <div class="ttl">🎯 Exercices — difficulté</div>
+      <div class="prog" id="exTiersProg"></div>
+    </div>
+    <div class="scroll" id="exTiersList"></div>
+  </section>
+
+  <!-- EXERCICE EN COURS -->
+  <section class="screen" id="scr-ex">
+    <div class="hud">
+      <button class="iconbtn" id="exQuit">✕</button>
+      <div class="pill" id="exPill"></div>
+      <div class="prog" id="exCount" style="margin-left:auto"></div>
+    </div>
+    <div class="scroll" id="exBody" style="display:flex;flex-direction:column"></div>
+  </section>
+
+  <!-- RÉSULTAT EXERCICES -->
+  <section class="screen" id="scr-exres">
+    <div class="exRes" id="exResBody"></div>
+    <div class="stack" style="padding-top:.9rem" id="exResBtns"></div>
+  </section>
+
+  <!-- CRÉDITS & CONTACT -->
+  <section class="screen" id="scr-credits">
+    <div class="top">
+      <button class="iconbtn" data-go="scr-home">←</button>
+      <div class="ttl">ℹ️ Crédits & contact</div>
+    </div>
+    <div class="scroll" id="creditsBody"></div>
+  </section>
+
+
+  <!-- OVERLAY -->
+  <div class="ovl" id="ovl">
+    <div class="ovlbox" id="ovlBox"></div>
+  </div>
+
+</div>
+<script>
+/* ============================================================
+   🎬 CINÉMATIQUE — LE JEU  ·  Terminale spé Physique-Chimie
+   Fichier unique, mobile-first, format 9:16
+   ============================================================ */
+"use strict";
+
+/* ---------- CONSTANTES PHYSIQUES ---------- */
+const G = 9.8;              // m/s² (valeur utilisée dans les défis)
+const GAME_G = 10;          // m/s² (jeu parabolique : chiffres ronds)
+
+/* ============================================================
+   1) DONNÉES : LEÇONS + QUIZ
+   ============================================================ */
+const V = "v⃗", R = "r⃗", A = "a⃗", Gv = "g⃗", OM = "OM⃗", D = "Δr⃗";
+
+const LEVELS = [
+{
+  id:0, icon:"🧭", title:"Référentiels & vecteur position", tag:"Niveau 1",
+  lesson:[
+    {h:"🎯 La cinématique, c’est quoi ?",
+     p:`La <b>cinématique</b> décrit le mouvement d’un objet (trajectoire, vitesse, accélération) <b>sans s’interroger sur les causes</b> de ce mouvement : les causes, ce sont les forces, étudiées en dynamique.`},
+    {h:"🧍 Le mouvement est relatif",
+     p:`Un même objet peut être à la fois en mouvement et au repos : tout dépend de l’observateur. Un passager est <b>immobile dans son train</b>… mais <b>en mouvement</b> pour une personne au bord de la voie.`},
+    {h:"📌 Le référentiel",
+     p:`Pour décrire un mouvement, on choisit un <b>référentiel</b> : un solide de référence auquel on associe un <b>repère</b> (origine + axes) et une <b>horloge</b>. Ex. : référentiel terrestre, référentiel du train, référentiel géocentrique.`,
+     f:[`référentiel = solide + repère + horloge`]},
+    {h:"📍 Le vecteur position",
+     p:`Le vecteur position ${R}(t) = ${OM}(t) relie l’origine O du repère au point M où se trouve le système. Il se décompose sur les axes : ${OM} = x·uₓ + y·u_y + z·u_z.`,
+     f:[`${R}(t) = ${OM}(t)`, `M (x ; y ; z) à l’instant t`]},
+    {h:"➡️ Le déplacement",
+     p:`Le déplacement entre deux instants est le vecteur qui va de la <b>position initiale</b> à la <b>position finale</b>. Sa norme est la distance « à vol d’oiseau », toujours ≤ au chemin réellement parcouru.`,
+     f:[`${D} = ${R}(t₂) − ${R}(t₁)`, `‖${D}‖ ≤ chemin parcouru`]}
+  ],
+  game:"ref",
+  quiz:[
+    {q:"Un objet immobile dans un train qui roule est, dans le référentiel terrestre :",
+     a:["au repos","en mouvement","inertiel"],c:1,
+     exp:"Le train se déplace par rapport au sol : l’objet est donc <b>en mouvement</b> dans le référentiel terrestre."},
+    {q:"Le vecteur déplacement entre t₁ et t₂ est :",
+     a:["la distance totale parcourue","le vecteur reliant la position initiale à la position finale","le vecteur partant de la position finale vers l’initiale"],c:1,
+     exp:`Le déplacement est ${D} = ${R}(t₂) − ${R}(t₁) : il va de la position <b>initiale</b> (t₁) vers la position <b>finale</b> (t₂).`}
+  ]
+},
+{
+  id:1, icon:"🚗", title:"Vecteur vitesse", tag:"Niveau 2",
+  lesson:[
+    {h:"🚀 Le vecteur vitesse",
+     p:`La vitesse indique <b>à quelle vitesse</b> et <b>dans quelle direction</b> le système se déplace. Le vecteur vitesse est toujours <b>tangent à la trajectoire</b>, orienté dans le sens du mouvement.`,
+     f:[`${V}(t) = d${R}/dt`, `vitesse moyenne : v̄ = Δx / Δt`]},
+    {h:"📈 Vitesse et graphique x(t)",
+     p:`Sur un graphique x(t), la vitesse instantanée est la <b>pente de la tangente</b> à la courbe à l’instant t. Si x(t) est une droite, la pente est constante : le mouvement est <b>uniforme</b>.`,
+     f:[`v = pente de x(t) = Δx / Δt`]},
+    {h:"➡️ Le signe de la vitesse",
+     p:`En mouvement rectiligne, le signe de v donne le <b>sens</b> du mouvement : v > 0 le mobile avance (x croît), v < 0 il recule (x décroît), v = 0 il est arrêté à cet instant.`,
+     f:[`mouvement uniforme : x(t) = x₀ + v·t`]}
+  ],
+  game:"vitesse",
+  quiz:[
+    {q:"Sur un graphique x(t), la vitesse instantanée se lit en calculant :",
+     a:["l’aire sous la courbe","la pente de la tangente à la courbe","la coordonnée du point"],c:1,
+     exp:"La vitesse est la <b>dérivée</b> de la position, donc la pente de la tangente à x(t)."},
+    {q:"Un mobile a pour équation horaire x(t) = −5t + 2 (en m). Sa vitesse vaut :",
+     a:["5 m/s","−5 m/s","−5t m/s"],c:1,
+     exp:"x(t) est une droite de pente −5 : la vitesse vaut <b>−5 m/s</b>. Le signe négatif signifie qu’il se déplace dans le sens opposé à l’axe."}
+  ]
+},
+{
+  id:2, icon:"⚡", title:"Accélération & MRUA", tag:"Niveau 3",
+  lesson:[
+    {h:"⚡ Le vecteur accélération",
+     p:`L’accélération décrit la <b>variation de la vitesse</b> (en valeur et/ou en direction). C’est la dérivée du vecteur vitesse, donc la dérivée seconde du vecteur position.`,
+     f:[`${A}(t) = d${V}/dt = d²${R}/dt²`]},
+    {h:"🔋 Accéléré, ralenti ou uniforme ?",
+     p:`On compare les sens de ${A} et de ${V} : <b>même sens</b> → le mobile accélère (v augmente) ; <b>sens opposés</b> → il ralentit ; ${A} = ⃗0 → mouvement <b>uniforme</b> (${V} ne change pas).`,
+     f:[`${A} et ${V} de même sens ⇒ v augmente`, `${A} et ${V} opposés ⇒ v diminue`]},
+    {h:"📉 Le MRUA",
+     p:`Mouvement Rectiligne Uniformément Accéléré : l’accélération ${A} est <b>constante</b>. Voici les 3 équations horaires à connaître <b>par cœur</b> — elles servent dans presque tous les exercices !`,
+     f:[`v(t) = v₀ + a·t`, `x(t) = x₀ + v₀·t + ½·a·t²`, `v² = v₀² + 2·a·(x − x₀)`]}
+  ],
+  game:"mrua",
+  quiz:[
+    {q:"Un MRUA a v₀ = 3 m/s et a = 2 m/s². Quelle est sa vitesse à t = 4 s ?",
+     a:["8 m/s","11 m/s","5 m/s"],c:1,
+     exp:"v(t) = v₀ + a·t = 3 + 2×4 = <b>11 m/s</b>."},
+    {q:"Pendant un freinage, les vecteurs vitesse et accélération sont :",
+     a:["de même sens","de sens opposés","nuls"],c:1,
+     exp:"Pour ralentir, l’accélération doit s’opposer à la vitesse : les vecteurs sont de <b>sens opposés</b>."}
+  ]
+},
+{
+  id:3, icon:"📈", title:"Graphiques x(t), v(t), a(t)", tag:"Niveau 4",
+  lesson:[
+    {h:"📊 Trois graphiques liés",
+     p:`x(t), v(t) et a(t) décrivent le <b>même</b> mouvement : chacun est la dérivée du précédent. On passe de l’un à l’autre grâce à la <b>pente</b> de la courbe.`,
+     f:[`pente de x(t) → v(t)`, `pente de v(t) → a(t)`]},
+    {h:"📐 Les aires",
+     p:`Inversement, <b>l’aire sous la courbe</b> donne la variation de la grandeur du graphique « du dessous ». C’est le lien dérivée ↔ intégrale.`,
+     f:[`aire sous v(t) → Δx (déplacement)`, `aire sous a(t) → Δv`]},
+    {h:"🔍 Reconnaître un mouvement",
+     p:`x(t) horizontale → repos. x(t) droite inclinée → mouvement uniforme (pente = v). x(t) parabole → MRUA (a constant ≠ 0). Un extremum de x(t) correspond à v = 0 : le mobile rebrousse chemin.`}
+  ],
+  game:"graphes",
+  quiz:[
+    {q:"L’aire sous le graphique v(t) entre t₁ et t₂ est égale à :",
+     a:["la variation de vitesse Δv","le déplacement Δx","l’accélération"],c:1,
+     exp:"v = dx/dt, donc l’aire sous v(t) donne le <b>déplacement Δx</b>."},
+    {q:"Si la vitesse v(t) augmente au cours du temps, l’accélération a est :",
+     a:["positive","négative","nulle"],c:0,
+     exp:"a est la pente de v(t). Une vitesse croissante correspond à une accélération <b>positive</b>."}
+  ]
+},
+{
+  id:4, icon:"🍎", title:"Tir vertical & chute libre", tag:"Niveau 5",
+  lesson:[
+    {h:"🌍 Le champ de pesanteur",
+     p:`Près de la Terre, tout système de masse m subit son poids ⃗P = m·${Gv}. Le champ de pesanteur ${Gv} est <b>vertical</b>, dirigé <b>vers le bas</b>, de norme g ≈ 9,81 m/s² (arrondi à 9,8 ou 10 dans les exercices).`,
+     f:[`⃗P = m·${Gv}`, `‖${Gv}‖ = 9,81 m/s²`]},
+    {h:"🍎 Chute libre : a⃗ = g⃗",
+     p:`D’après la 2ᵉ loi de Newton, m·${A} = m·${Gv}, donc ${A} = ${Gv} (constante). On parle de <b>chute libre</b> quand le système n’est soumis qu’à son poids et que ${V}₀ = ⃗0 : il part sans vitesse.`,
+     f:[`${A} = ${Gv} (constant)`, `chute libre ⇔ v₀ = 0`]},
+    {h:"⬆️ Le tir vertical",
+     p:`On choisit un axe vertical orienté vers le haut : la composante de ${Gv} vaut alors −g. On retrouve un MRUA avec a = −g.`,
+     f:[`v(t) = v₀ − g·t`, `z(t) = z₀ + v₀·t − ½·g·t²`, `v² = v₀² − 2g·(z − z₀)`]},
+    {h:"🔝 Flèche et symétrie",
+     p:`Au sommet de la trajectoire, la vitesse s’annule : v = 0. On en déduit l’instant t = v₀/g et la hauteur maximale (la <b>flèche</b>) h = v₀²/(2g). Le temps de montée est égal au temps de descente.`,
+     f:[`flèche : h = v₀² / (2g)`, `sommet atteint à t = v₀ / g`]}
+  ],
+  game:"vertical",
+  quiz:[
+    {q:"« Chute libre » signifie que le système :",
+     a:["n’est soumis qu’à son poids et part sans vitesse initiale (v₀ = 0)","a une vitesse initiale nulle mais pas d’accélération","tombe forcément dans le vide"],c:0,
+     exp:"En chute libre, l’objet n’est soumis qu’à son poids : ${A} = ${Gv}, et sa vitesse initiale est nulle."},
+    {q:"Au sommet de sa trajectoire, une balle lancée vers le haut a :",
+     a:["v = 0 et a = 0","v = 0 et a = g dirigée vers le bas","sa vitesse maximale et a = 0"],c:1,
+     exp:"La vitesse s’annule bien à l’instant le plus haut, mais pas l’accélération : elle vaut toujours g, <b>dirigée vers le bas</b>."}
+  ]
+},
+{
+  id:5, icon:"🎯", title:"Mouvement parabolique", tag:"Niveau 6",
+  lesson:[
+    {h:"🎯 Superposer deux mouvements",
+     p:`Un projectile lancé avec un angle α n’est soumis qu’à son poids. Le mouvement se décompose en : un mouvement <b>horizontal uniforme</b> (rien ne s’oppose à la vitesse horizontale) et un mouvement <b>vertical MRUA</b> (accéléré par g). On étudie séparément x(t) et y(t) !`,
+     f:[`x(t) = v₀·cos(α)·t`, `y(t) = v₀·sin(α)·t − ½·g·t²`]},
+    {h:"🌈 Une trajectoire en parabole",
+     p:`En éliminant le temps t entre x(t) et y(t), on obtient l’équation de la trajectoire : y en fonction de x. C’est un polynôme du 2ᵈ degré : la trajectoire est une <b>parabole</b> tournée vers le bas.`,
+     f:[`y = − g·x² / (2·v₀²·cos²α) + x·tan(α)`]},
+    {h:"🏁 Portée et flèche",
+     p:`À niveau de départ = niveau d’arrivée : la <b>portée</b> est la distance horizontale maximale parcourue, et la <b>flèche</b> la hauteur maximale. Toutes deux dépendent de v₀ et de l’angle α.`,
+     f:[`portée = v₀²·sin(2α) / g`, `flèche = v₀²·sin²α / (2g)`]}
+  ],
+  game:"parabolique",
+  quiz:[
+    {q:"Dans un mouvement parabolique (frottements négligés), la composante horizontale de la vitesse :",
+     a:["reste constante","diminue","augmente"],c:0,
+     exp:"Aucune force horizontale n’agit : la vitesse horizontale vₓ = v₀·cos(α) reste <b>constante</b>. Seule la composante verticale est modifiée par g."},
+    {q:"La trajectoire d’un projectile (frottements négligés) est :",
+     a:["une droite","une parabole","un cercle"],c:1,
+     exp:"Un mouvement horizontal uniforme + un mouvement vertical uniformément accéléré donnent une <b>parabole</b>."}
+  ]
+},
+{
+  id:6, icon:"🪂", title:"Mouvement avec frottements", tag:"Niveau 7",
+  lesson:[
+    {h:"🪂 La force de frottement",
+     p:`Dans un fluide (air, eau…), un objet en mouvement subit une force de frottement <b>opposée à sa vitesse</b> et de norme proportionnelle à v : ⃗f = −k·${V}, avec k > 0 (coefficient de frottement).`,
+     f:[`⃗f = −k·${V}   (k > 0)`]},
+    {h:"📉 Une vitesse exponentielle",
+     p:`La 2ᵉ loi de Newton s’écrit m·dv/dt = −k·v. La solution n’est pas une droite mais une <b>décroissance exponentielle</b> : la vitesse diminue très vite au début, puis de plus en plus lentement… sans jamais s’annuler rigoureusement.`,
+     f:[`v(t) = v₀·e^(−t/τ)`, `τ = m / k  (temps caractéristique)`]},
+    {h:"⏱️ Interpréter τ",
+     p:`Au bout d’une durée τ, la vitesse est réduite à environ <b>37 %</b> de sa valeur initiale (car e⁻¹ ≈ 0,37). Plus k est grand (beaucoup de frottements) ou plus m est petit, plus la vitesse chute vite.`,
+     f:[`v(τ) = v₀·e⁻¹ ≈ 0,37·v₀`]}
+  ],
+  game:"frottements",
+  quiz:[
+    {q:"Pour un frottement fluide, la force de frottement s’écrit :",
+     a:["f = k·v (dans le sens du mouvement)","f = −k·v (opposée à la vitesse)","f = k·m·g (constante)"],c:1,
+     exp:"La force de frottement fluide est <b>colinéaire et opposée</b> à la vitesse : ⃗f = −k·${V}."},
+    {q:"Avec ⃗f = −k·${V}, l’évolution de la vitesse est :",
+     a:["une décroissance exponentielle qui tend vers 0","une droite qui atteint 0 en un temps fini","une vitesse constante"],c:0,
+     exp:"La solution de m·dv/dt = −k·v est v(t) = v₀·e^(−t/τ) : une <b>exponentielle décroissante</b> qui tend vers 0 sans jamais l’atteindre."}
+  ]
+},
+{
+  id:7, icon:"🚆", title:"Référentiels galiléens & Galilée", tag:"Niveau 8",
+  lesson:[
+    {h:"⚖️ Le principe d’inertie",
+     p:`Un <b>référentiel galiléen</b> est un référentiel dans lequel un système <b>seul</b> (forces négligées) est soit immobile, soit en mouvement rectiligne uniforme. Dans ce cas ${A} = ⃗0. Le référentiel terrestre est galiléen en très bonne approximation.`,
+     f:[`référentiel galiléen ⇒ système seul : ${A} = ⃗0`]},
+    {h:"🔗 La relation de Galilée",
+     p:`Pour changer de référentiel (en translation), on <b>additionne les vitesses</b> : la vitesse de A par rapport à R est la somme de sa vitesse par rapport à B et de la vitesse de B par rapport à R.`,
+     f:[`${V}_{A/R} = ${V}_{A/B} + ${V}_{B/R}`, `${V}_{B/A} = −${V}_{A/B}`]},
+    {h:"🚆 Un exemple concret",
+     p:`Tu marches à 2 m/s dans un train qui roule à 30 m/s. Vers l’avant, ta vitesse par rapport au sol est 30 + 2 = <b>32 m/s</b>. Vers l’arrière, elle est 30 − 2 = <b>28 m/s</b>. Ta vitesse dépend du référentiel choisi !`}
+  ],
+  game:"galilee",
+  quiz:[
+    {q:"Un référentiel galiléen est un référentiel dans lequel :",
+     a:["un système soumis à aucune force est immobile ou en MRU","tous les objets sont immobiles","les forces n’existent pas"],c:0,
+     exp:"C’est le principe d’inertie : dans un référentiel galiléen, un système seul garde une vitesse constante (éventuellement nulle)."},
+    {q:"La relation de Galilée s’écrit :",
+     a:[`${V}_{A/R} = ${V}_{A/B} − ${V}_{B/R}`,`${V}_{A/R} = ${V}_{A/B} + ${V}_{B/R}`,`${V}_{A/R} = ${V}_{B/R} − ${V}_{A/B}`],c:1,
+     exp:`On additionne les vitesses : ${V}_{A/R} = ${V}_{A/B} + ${V}_{B/R}.`}
+  ]
+}
+];
+
+/* ---------- FICHE DE RÉVISION ---------- */
+const FICHE = [
+  {h:"1 · Repérage du mouvement", f:[
+    `référentiel = solide de référence + repère (O, axes) + horloge`,
+    `${R}(t) = ${OM}(t)   →   M(x ; y ; z)`,
+    `${D} = ${R}(t₂) − ${R}(t₁)`]},
+  {h:"2 · Vitesse", f:[
+    `${V}(t) = d${R}/dt   (tangente à la trajectoire)`,
+    `v̄ = Δx / Δt     v = pente de x(t)`,
+    `mouvement uniforme : x(t) = x₀ + v·t`]},
+  {h:"3 · Accélération & MRUA", f:[
+    `${A} = d${V}/dt = d²${R}/dt²`,
+    `v(t) = v₀ + a·t`,
+    `x(t) = x₀ + v₀·t + ½·a·t²`,
+    `v² = v₀² + 2·a·(x − x₀)`]},
+  {h:"4 · Graphiques", f:[
+    `pente de x(t) → v(t) ; pente de v(t) → a(t)`,
+    `aire sous v(t) → Δx ; aire sous a(t) → Δv`]},
+  {h:"5 · Champ de pesanteur / tir vertical", f:[
+    `⃗P = m·${Gv}   ;   ${A} = ${Gv}   (g = 9,81 m/s²)`,
+    `v(t) = v₀ − g·t`,
+    `z(t) = z₀ + v₀·t − ½·g·t²`,
+    `v² = v₀² − 2g·(z − z₀)`,
+    `flèche h = v₀²/(2g)   ;   t_sommet = v₀/g`]},
+  {h:"6 · Mouvement parabolique", f:[
+    `x(t) = v₀·cos α·t`,
+    `y(t) = v₀·sin α·t − ½·g·t²`,
+    `y = − g·x²/(2 v₀² cos²α) + x·tan α`,
+    `portée = v₀²·sin 2α / g   ;   flèche = v₀² sin²α /(2g)`]},
+  {h:"7 · Frottements fluides", f:[
+    `⃗f = −k·${V}`,
+    `m·dv/dt = −k·v`,
+    `v(t) = v₀·e^(−t/τ)   avec τ = m/k`]},
+  {h:"8 · Référentiels / Galilée", f:[
+    `référentiel galiléen : système seul ⇒ ${A} = ⃗0`,
+    `${V}_{A/R} = ${V}_{A/B} + ${V}_{B/R}`,
+    `${V}_{B/A} = −${V}_{A/B}`]}
+];
+
+const TRAPS = [
+  "⚠️ Le vecteur vitesse est <b>tangent</b> à la trajectoire — pas le vecteur accélération.",
+  "⚠️ Au sommet d’un tir vertical, v = 0 mais <b>a = g</b> (vers le bas), pas 0 !",
+  "⚠️ En MRU, v⃗ est constant : le vecteur accélération est <b>nul</b>.",
+  "⚠️ Dans le mouvement parabolique, seule la vitesse <b>verticale</b> varie ; l’horizontale reste constante (sans frottements).",
+  "⚠️ Sur un graphique, on lit v(t) avec la <b>pente</b> de x(t), et le déplacement avec l’<b>aire</b> sous v(t) : ne pas confondre !",
+  "⚠️ Le mouvement est <b>relatif</b> : toujours préciser le référentiel avant de conclure « en mouvement » ou « au repos ».",
+  "⚠️ Avec frottements, la vitesse ne s’annule jamais vraiment : elle tend vers 0 (exponentielle)."
+];
+
+/* ============================================================
+   2) OUTILS
+   ============================================================ */
+const $  = (s, r=document) => r.querySelector(s);
+const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
+const fmt = (x, d=1) => Number(x).toFixed(d).replace(".", ",");
+const clamp = (x,a,b) => Math.min(b, Math.max(a, x));
+const shuffle = a => { const t=a.slice(); for(let i=t.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[t[i],t[j]]=[t[j],t[i]];} return t; };
+
+let cancels = [];
+function stopAll(){ cancels.forEach(c => { try{ c(); }catch(e){} }); cancels = []; }
+function loop(fn){ let id = requestAnimationFrame(function step(){ fn(); id = requestAnimationFrame(step); }); cancels.push(()=>cancelAnimationFrame(id)); }
+function after(ms, fn){ const id = setTimeout(fn, ms); cancels.push(()=>clearTimeout(id)); }
+
+const SCREENS = ["scr-home","scr-course","scr-fiche","scr-map","scr-lesson","scr-game","scr-quiz","scr-result","scr-final"];
+function show(id){
+  stopAll();
+  stopScene();
+  closeOvl();
+  SCREENS.forEach(s => document.getElementById(s).classList.toggle("active", s === id));
+  const el = document.getElementById(id);
+  $$(".scroll", el).forEach(s => s.scrollTop = 0);
+}
+
+/* redimensionne la police selon la largeur du cadre 9:16 */
+function fitFont(){
+  const w = document.getElementById("app").clientWidth || 400;
+  document.documentElement.style.fontSize = clamp(w/25, 13, 23).toFixed(2) + "px";
+}
+window.addEventListener("resize", fitFont);
+window.addEventListener("orientationchange", ()=>setTimeout(fitFont,150));
+
+/* ---------- son (petits bips) ---------- */
+let soundOn = true;
+try{ soundOn = localStorage.getItem("cinema_son") !== "0"; }catch(e){}
+let actx = null;
+function beep(ok){
+  if(!soundOn) return;
+  try{
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    if(actx.state === "suspended") actx.resume();
+    const o = actx.createOscillator(), g = actx.createGain();
+    o.connect(g); g.connect(actx.destination);
+    o.type = ok ? "sine" : "sawtooth";
+    const t = actx.currentTime;
+    o.frequency.setValueAtTime(ok ? 660 : 200, t);
+    o.frequency.exponentialRampToValueAtTime(ok ? 990 : 120, t + 0.12);
+    g.gain.setValueAtTime(0.07, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.34);
+    o.start(t); o.stop(t + 0.36);
+  }catch(e){}
+}
+
+/* ---------- canvas ---------- */
+function mkCanvas(cv){
+  const dpr = Math.min(window.devicePixelRatio || 1, 2.5);
+  const w = Math.max(1, cv.clientWidth), h = Math.max(1, cv.clientHeight);
+  cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
+  const ctx = cv.getContext("2d");
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return { ctx, w, h };
+}
+function rr(ctx, x, y, w, h, r){
+  r = Math.min(r, w/2, h/2);
+  ctx.beginPath();
+  ctx.moveTo(x+r, y); ctx.arcTo(x+w, y, x+w, y+h, r); ctx.arcTo(x+w, y+h, x, y+h, r);
+  ctx.arcTo(x, y+h, x, y, r); ctx.arcTo(x, y, x+w, y, r); ctx.closePath();
+}
+function arrow(ctx, x1, y1, x2, y2, color, lw=2, head=8){
+  const a = Math.atan2(y2-y1, x2-x1);
+  ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = lw;
+  ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(x2,y2);
+  ctx.lineTo(x2 - head*Math.cos(a-0.45), y2 - head*Math.sin(a-0.45));
+  ctx.lineTo(x2 - head*Math.cos(a+0.45), y2 - head*Math.sin(a+0.45));
+  ctx.closePath(); ctx.fill();
+}
+
+/* ---------- corrige les mises en forme ---------- */
+const HRT_ON = "❤️", HRT_OFF = "🖤";
+
+/* ============================================================
+   3) MINI-JEUX
+   ============================================================ */
+let sceneCancels = [];
+function stopScene(){ sceneCancels.forEach(c => { try{ c(); }catch(e){} }); sceneCancels = []; }
+function sceneLoop(fn){ let id = requestAnimationFrame(function step(){ fn(); id = requestAnimationFrame(step); }); sceneCancels.push(()=>cancelAnimationFrame(id)); }
+
+/* --- boutons QCM partagés --- */
+function renderOpts(container, r, api, onDone){
+  container.innerHTML = "";
+  r.a.forEach((txt, idx) => {
+    const b = document.createElement("button");
+    b.className = "opt";
+    b.innerHTML = `<span class="k">${["A","B","C","D"][idx]}</span><span>${txt}</span>`;
+    b.onclick = () => {
+      if(idx === r.c){
+        b.classList.add("good");
+        $$(".opt", container).forEach(x => x.disabled = true);
+        api.correct(r.exp, onDone);
+      } else {
+        b.classList.add("bad"); b.disabled = true;
+        const good = container.children[r.c]; if(good) good.classList.add("good");
+        $$(".opt", container).forEach(x => x.disabled = true);
+        if(api.wrong(r.exp)) after(2000, onDone);
+      }
+    };
+    container.appendChild(b);
+  });
+}
+
+/* --- mini-graphe pour le jeu "graphes" --- */
+function drawMini(cv, fn, col){
+  const { ctx, w, h } = mkCanvas(cv);
+  ctx.clearRect(0, 0, w, h);
+  const mx = 8, top = 8, bot = h - 8;
+  ctx.strokeStyle = "rgba(255,255,255,.35)"; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(mx, bot); ctx.lineTo(w - 4, bot); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(mx, bot); ctx.lineTo(mx, top); ctx.stroke();
+  ctx.strokeStyle = "rgba(255,255,255,.12)"; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(mx, (top + bot) / 2); ctx.lineTo(w - 4, (top + bot) / 2); ctx.stroke();
+  ctx.strokeStyle = col; ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  for(let k = 0; k <= 50; k++){
+    const u = k / 50;
+    const px = mx + u * (w - mx - 6);
+    const py = bot - ((fn(u) + 1) / 2) * (bot - top);
+    k === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+  }
+  ctx.stroke();
+}
+
+/* ---------- 1. Référentiels ---------- */
+function gRef(el, api){
+  const rounds = [
+    {q:"Dans quel référentiel le <b>passager</b> est-il immobile ?",
+     a:["Le train 🚆","Le bord de la voie 🌳","Le ciel ☁️"], c:0,
+     exp:"Le passager est solidaire du train : il est immobile dans le référentiel du train."},
+    {q:"Dans quel référentiel l’<b>arbre</b> est-il immobile ?",
+     a:["Le train 🚆","Le bord de la voie 🌳 (référentiel terrestre)","Le passager 🧍"], c:1,
+     exp:"L’arbre est fixé au sol : il est immobile dans le référentiel terrestre."},
+    {q:"Dans quel référentiel la <b>locomotive</b> est-elle en mouvement ?",
+     a:["Le train 🚆","Le référentiel de la locomotive","Le bord de la voie 🌳"], c:2,
+     exp:"Par rapport au sol, la locomotive se déplace : elle est en mouvement dans le référentiel terrestre."}
+  ];
+  let i = 0;
+  function render(){
+    stopScene();
+    el.innerHTML = `<div class="cvwrap" style="height:13rem"><canvas class="cv"></canvas></div>
+      <div class="qtext">${rounds[i].q}</div><div class="opts" id="gopts"></div>`;
+    sceneRef(el.querySelector("canvas"));
+    renderOpts($("#gopts", el), rounds[i], api, () => { i++; i < rounds.length ? render() : api.toQuiz(); });
+  }
+  render();
+}
+function sceneRef(cv){
+  const { ctx, w, h } = mkCanvas(cv);
+  const t0 = performance.now();
+  sceneLoop(() => {
+    const t = (performance.now() - t0) / 1000;
+    ctx.clearRect(0, 0, w, h);
+    const gy = h - 30;
+    ctx.fillStyle = "#122b1d"; ctx.fillRect(0, gy, w, h - gy);
+    ctx.strokeStyle = "#3ddc97"; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(w, gy); ctx.stroke();
+    // nuage
+    const cx = w * 0.24 + Math.sin(t * 0.6) * 6;
+    ctx.fillStyle = "rgba(255,255,255,.13)";
+    ctx.beginPath(); ctx.arc(cx, h * 0.14, 11, 0, 7); ctx.arc(cx + 15, h * 0.14, 16, 0, 7); ctx.arc(cx + 32, h * 0.14, 10, 0, 7); ctx.fill();
+    // arbre
+    const tx = w - 56;
+    ctx.fillStyle = "#6b4522"; ctx.fillRect(tx - 4, gy - 40, 8, 40);
+    ctx.fillStyle = "#2f9e58";
+    [[0, -52, 19], [-15, -40, 13], [15, -40, 13]].forEach(([dx, dy, rad]) => { ctx.beginPath(); ctx.arc(tx + dx, gy + dy, rad, 0, 7); ctx.fill(); });
+    // train
+    const tw = 130, th = 50, span = w + tw + 60;
+    const x0 = ((t * 70) % span) - tw - 30, ty = gy - th;
+    rr(ctx, x0, ty, tw, th, 9); ctx.fillStyle = "#245e9e"; ctx.fill();
+    rr(ctx, x0 + tw - 38, ty - 19, 38, 25, 7); ctx.fillStyle = "#2f77c7"; ctx.fill();
+    for(let k = 0; k < 3; k++){ rr(ctx, x0 + 10 + k * 32, ty + 9, 23, 17, 4); ctx.fillStyle = "#bfe3ff"; ctx.fill(); }
+    ctx.fillStyle = "#ffd166";
+    ctx.beginPath(); ctx.arc(x0 + 10 + 32 + 11, ty + 17, 6, 0, 7); ctx.fill();
+    ctx.fillStyle = "#0d1220";
+    for(let k = 0; k < 3; k++){ ctx.beginPath(); ctx.arc(x0 + 24 + k * 43, ty + th + 7, 8, 0, 7); ctx.fill(); }
+    arrow(ctx, x0 + tw / 2 - 30, ty - 32, x0 + tw / 2 + 32, ty - 32, "#3fd8ff", 3, 9);
+    ctx.fillStyle = "#3fd8ff"; ctx.font = "11px system-ui"; ctx.textAlign = "center";
+    ctx.fillText("v (train)", x0 + tw / 2, ty - 40);
+    ctx.fillStyle = "#98a1d4"; ctx.fillText("l’arbre", tx, gy + 17);
+  });
+}
+
+/* ---------- 2. Vitesse ---------- */
+function gVit(el, api){
+  const R = [
+    {q:"Voici x(t). Quelle est la vitesse moyenne entre A (t = 1 s) et B (t = 3 s) ?",
+     pts:[[0, 0], [1, 2], [3, 10], [4, 14]], A:[1, 2], B:[3, 10], tmax:4.4,
+     a:["8 m/s", "2 m/s", "4 m/s", "0,5 m/s"], c:2,
+     exp:"v = Δx / Δt = (10 − 2) / (3 − 1) = 8/2 = <b>4 m/s</b> : c’est la pente de la sécante (AB)."},
+    {q:"Même méthode entre A (t = 2 s) et B (t = 4 s) : que trouves-tu ?",
+     pts:[[0, 4], [2, -2], [4, -8], [5, -11]], A:[2, -2], B:[4, -8], tmax:5.4,
+     a:["3 m/s", "−2 m/s", "−3 m/s", "−6 m/s"], c:2,
+     exp:"v = (−8 − (−2)) / (4 − 2) = −6/2 = <b>−3 m/s</b>. La vitesse est négative : le mobile se déplace dans le sens opposé à l’axe des x."}
+  ];
+  let i = 0;
+  function render(){
+    stopScene();
+    const r = R[i];
+    el.innerHTML = `<div class="cvwrap" style="height:16.5rem"><canvas class="cv"></canvas></div>
+      <div class="qtext">${r.q}</div><div class="opts" id="gopts"></div>`;
+    sceneGraph(el.querySelector("canvas"), r);
+    renderOpts($("#gopts", el), r, api, () => { i++; i < R.length ? render() : api.toQuiz(); });
+  }
+  render();
+}
+function interpSeg(pts, t){
+  for(let k = 0; k < pts.length - 1; k++){
+    const [t1, x1] = pts[k], [t2, x2] = pts[k + 1];
+    if(t >= t1 && t <= t2) return x1 + (x2 - x1) * (t - t1) / (t2 - t1);
+  }
+  return t <= pts[0][0] ? pts[0][1] : pts[pts.length - 1][1];
+}
+function sceneGraph(cv, r){
+  const { ctx, w, h } = mkCanvas(cv);
+  const t0 = performance.now();
+  const padL = 30, padR = 12, padT = 14, padB = 8;
+  const plotH = h * 0.66;
+  const xs = r.pts.map(p => p[1]);
+  let xmin = Math.min(...xs), xmax = Math.max(...xs);
+  let sp = (xmax - xmin) * 0.18 || 1; xmin -= sp; xmax += sp;
+  const tmax = r.tmax;
+  const X = t => padL + (t / tmax) * (w - padL - padR);
+  const Y = x => padT + (xmax - x) / (xmax - xmin) * (plotH - padT - padB);
+  const sy = h - 30;
+  const SX = x => padL + (x - xmin) / (xmax - xmin) * (w - padL - padR);
+  sceneLoop(() => {
+    const tm = (performance.now() - t0) / 1000;
+    ctx.clearRect(0, 0, w, h);
+    ctx.fillStyle = "rgba(255,255,255,.03)"; ctx.fillRect(padL, padT, w - padL - padR, plotH - padT - padB);
+    ctx.strokeStyle = "rgba(255,255,255,.07)"; ctx.lineWidth = 1;
+    for(let tt = 0; tt <= tmax; tt += 1){ ctx.beginPath(); ctx.moveTo(X(tt), padT); ctx.lineTo(X(tt), plotH - padB); ctx.stroke(); }
+    ctx.strokeStyle = "rgba(255,255,255,.45)"; ctx.lineWidth = 1.5;
+    arrow(ctx, padL, plotH - padB, w - 6, plotH - padB, "rgba(255,255,255,.45)", 1.5, 7);
+    arrow(ctx, padL, plotH - padB, padL, 6, "rgba(255,255,255,.45)", 1.5, 7);
+    ctx.fillStyle = "#98a1d4"; ctx.font = "11px system-ui"; ctx.textAlign = "left";
+    ctx.fillText("t (s)", w - 30, plotH - padB + 15); ctx.fillText("x (m)", padL + 4, 9);
+    // courbe
+    ctx.strokeStyle = "#3fd8ff"; ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    r.pts.forEach((p, k) => { const px = X(p[0]), py = Y(p[1]); k ? ctx.lineTo(px, py) : ctx.moveTo(px, py); });
+    ctx.stroke();
+    // sécante
+    const [ta, xa] = r.A, [tb, xb] = r.B;
+    const slope = (xb - xa) / (tb - ta);
+    ctx.strokeStyle = "#ffd166"; ctx.setLineDash([6, 5]); ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(X(0), Y(xa + slope * (0 - ta))); ctx.lineTo(X(tmax), Y(xa + slope * (tmax - ta))); ctx.stroke();
+    ctx.setLineDash([]);
+    // points A, B
+    [[r.A, "A"], [r.B, "B"]].forEach(([p, nm]) => {
+      ctx.fillStyle = "#ff5f8f"; ctx.beginPath(); ctx.arc(X(p[0]), Y(p[1]), 5, 0, 7); ctx.fill();
+      ctx.fillStyle = "#fff"; ctx.font = "bold 11px system-ui"; ctx.textAlign = "center";
+      ctx.fillText(nm, X(p[0]), Y(p[1]) - 10);
+    });
+    // bandeau position
+    ctx.strokeStyle = "rgba(255,255,255,.25)"; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(padL, sy); ctx.lineTo(w - padR, sy); ctx.stroke();
+    ctx.fillStyle = "#5d6a99"; ctx.font = "10px system-ui"; ctx.textAlign = "center";
+    ctx.fillText(fmt(xmin) + " m", padL + 6, sy + 16); ctx.fillText(fmt(xmax) + " m", w - padR - 6, sy + 16);
+    ctx.fillText("position du mobile", w / 2, sy - 8);
+    const tcur = (tm * 1.2) % tmax;
+    const xcur = interpSeg(r.pts, tcur);
+    const mx = SX(xcur);
+    ctx.fillStyle = "#3ddc97";
+    ctx.beginPath(); ctx.moveTo(mx, sy - 8); ctx.lineTo(mx + 7, sy - 1); ctx.lineTo(mx - 7, sy - 1); ctx.closePath(); ctx.fill();
+  });
+}
+
+/* ---------- 3. MRUA / freinage ---------- */
+function gMrua(el, api){
+  const T = [40, 15];
+  let i = 0;
+  function render(){
+    stopScene();
+    let v0 = 15, a = 5;
+    const target = T[i];
+    el.innerHTML = `
+      <div class="cvwrap" style="height:12.5rem"><canvas class="cv"></canvas></div>
+      <div class="qtext">Fais s’arrêter la voiture <b>pile sur la ligne</b> 🎯 (elle freine régulièrement).</div>
+      <div class="sl"><label>Vitesse v₀</label><input type="range" id="sv" min="5" max="40" step="1" value="15"><b id="svb">15 m/s</b></div>
+      <div class="sl"><label>Freinage |a|</label><input type="range" id="sa" min="1" max="8" step="0.5" value="5"><b id="sab">5,0 m/s²</b></div>
+      <div class="calc" id="calc"></div>
+      <button class="btn ok" id="go">🚀 Lancer la voiture</button>`;
+    const cv = el.querySelector("canvas");
+    const { ctx, w, h } = mkCanvas(cv);
+    const sv = $("#sv", el), sa = $("#sa", el), calc = $("#calc", el);
+    let carM = 0, running = false, t0 = 0, ended = false;
+    const M = 60;
+    const X = m => 12 + clamp(m, 0, M) / M * (w - 24);
+    const gy = () => h - 34;
+    function updCalc(){
+      const d = v0 * v0 / (2 * a);
+      calc.innerHTML = `v₀ = ${v0} m/s &nbsp;·&nbsp; |a| = ${fmt(a)} m/s²<br>distance d’arrêt = v₀² / (2·|a|) = <b>${fmt(d)} m</b>`;
+    }
+    sv.oninput = () => { v0 = +sv.value; $("#svb", el).textContent = v0 + " m/s"; updCalc(); };
+    sa.oninput = () => { a = +sa.value; $("#sab", el).textContent = fmt(a) + " m/s²"; updCalc(); };
+    updCalc();
+    function draw(){
+      const g = gy();
+      ctx.clearRect(0, 0, w, h);
+      ctx.fillStyle = "#0f1b2e"; ctx.fillRect(0, g, w, h - g);
+      ctx.strokeStyle = "#26385c"; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(0, g); ctx.lineTo(w, g); ctx.stroke();
+      ctx.strokeStyle = "rgba(255,255,255,.12)"; ctx.fillStyle = "#5d6a99"; ctx.font = "10px system-ui"; ctx.textAlign = "center";
+      for(let m = 0; m <= M; m += 10){
+        ctx.beginPath(); ctx.moveTo(X(m), g); ctx.lineTo(X(m), g + 7); ctx.stroke();
+        ctx.fillText(m + " m", X(m), g + 20);
+      }
+      ctx.strokeStyle = "#ffd166"; ctx.lineWidth = 3; ctx.setLineDash([6, 5]);
+      ctx.beginPath(); ctx.moveTo(X(target), g - 60); ctx.lineTo(X(target), g); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = "#ffd166"; ctx.font = "12px system-ui";
+      ctx.fillText("🎯 " + target + " m", X(target), g - 66);
+      const px = X(carM);
+      rr(ctx, px - 17, g - 17, 34, 14, 4); ctx.fillStyle = "#3fd8ff"; ctx.fill();
+      rr(ctx, px - 10, g - 25, 20, 10, 3); ctx.fillStyle = "#9beaff"; ctx.fill();
+      ctx.fillStyle = "#111";
+      ctx.beginPath(); ctx.arc(px - 9, g - 3, 4, 0, 7); ctx.arc(px + 9, g - 3, 4, 0, 7); ctx.fill();
+      if(running){ ctx.fillStyle = "#fff"; ctx.font = "bold 12px system-ui"; ctx.fillText("x = " + fmt(carM) + " m", px, g - 34); }
+    }
+    function endRun(){
+      const d = v0 * v0 / (2 * a);
+      if(Math.abs(d - target) <= 1.5){
+        api.correct(`Exact ! La voiture s’arrête à <b>${fmt(d)} m</b> du départ, pile sur la ligne 🎯`, () => { i++; i < T.length ? render() : api.toQuiz(); });
+      } else {
+        api.wrong(`Elle s’arrête à <b>${fmt(d)} m</b> au lieu de ${target} m. ` + (d > target
+          ? "Trop loin : freine plus fort ou pars moins vite."
+          : "Trop court : freine moins fort ou pars plus vite.") + ` <i>d = v₀²/(2|a|)</i>`);
+      }
+    }
+    sceneLoop(() => {
+      if(running){
+        const t = (performance.now() - t0) / 1000;
+        if(v0 - a * t <= 0){
+          running = false; carM = v0 * v0 / (2 * a);
+          if(!ended){ ended = true; endRun(); }
+        } else {
+          carM = v0 * t - 0.5 * a * t * t;
+        }
+      }
+      draw();
+    });
+    $("#go", el).onclick = () => {
+      if(running) return;
+      running = true; ended = false; carM = 0; t0 = performance.now();
+    };
+  }
+  render();
+}
+
+/* ---------- 4. Graphiques ---------- */
+function gGraph(el, api){
+  const R = [
+    {q:"Le graphique x(t) est une <b>droite croissante</b> (mouvement uniforme). Quel est le graphique v(t) correspondant ?",
+     opts:[u => 0.55, u => -0.55, u => -0.8 + 1.6 * u], c:0,
+     exp:"x(t) est une droite de pente positive et constante → la vitesse est constante et positive : une droite horizontale <b>au-dessus</b> de zéro."},
+    {q:"Le graphique v(t) est une <b>droite décroissante</b> qui devient négative. Quel est a(t) ?",
+     opts:[u => 0.6 - 1.2 * u, u => -0.5, u => 0.5], c:1,
+     exp:"a(t) est la pente de v(t) : constante et négative → une droite horizontale <b>sous</b> zéro."},
+    {q:"La vitesse v(t) est <b>constante et positive</b>. Quel est x(t) ?",
+     opts:[u => -0.7 + 1.4 * u, u => 0.35, u => -0.85 + 1.7 * u * u], c:0,
+     exp:"Une vitesse constante positive fait croître la position linéairement : x(t) est une <b>droite croissante</b>."}
+  ];
+  let i = 0;
+  function next(){ i++; i < R.length ? render() : api.toQuiz(); }
+  function render(){
+    stopScene();
+    const r = R[i];
+    el.innerHTML = `<div class="qtext">${r.q}</div><div class="grids" id="gg"></div>`;
+    const gg = $("#gg", el);
+    r.opts.forEach((fn, ix) => {
+      const b = document.createElement("button");
+      b.className = "gcard";
+      b.innerHTML = `<span class="gl">${["A", "B", "C"][ix]}</span><canvas></canvas>`;
+      b.onclick = () => {
+        if(ix === r.c){
+          b.classList.add("good"); $$(".gcard", gg).forEach(x => x.disabled = true);
+          api.correct(r.exp, next);
+        } else {
+          b.classList.add("bad"); b.disabled = true;
+          api.wrong(r.exp);
+        }
+      };
+      gg.appendChild(b);
+      drawMini(b.querySelector("canvas"), fn, "#3fd8ff");
+    });
+  }
+  render();
+}
+
+/* ---------- 5. Tir vertical ---------- */
+function gVert(el, api){
+  const R = [
+    {mode:"v0",
+     q:`Quelle vitesse initiale v₀ (en m/s) faut-il pour que la balle atteigne <b>exactement 19,6 m</b> ? <i>(chute libre, g = 9,8 m/s²)</i>`,
+     sol:19.6, tol:0.35, unit:"m/s",
+     exp:`v₀ = √(2·g·h) = √(2 × 9,8 × 19,6) = √384 ≈ <b>19,6 m/s</b>. Formule : h = v₀²/(2g).`},
+    {mode:"h",
+     q:`Une balle est lancée vers le haut à <b>14 m/s</b>. Quelle hauteur maximale (la flèche, en m) atteint-elle ? <i>(g = 9,8 m/s²)</i>`,
+     sol:10, tol:0.3, unit:"m",
+     exp:`h = v₀² / (2g) = 14² / (2 × 9,8) = 196 / 19,6 = <b>10 m</b>.`}
+  ];
+  let i = 0;
+  function next(){ i++; i < R.length ? render() : api.toQuiz(); }
+  function render(){
+    stopScene();
+    const r = R[i];
+    el.innerHTML = `
+      <div class="cvwrap" style="height:15rem"><canvas class="cv"></canvas></div>
+      <div class="qtext">${r.q}</div>
+      <div class="numrow">
+        <input type="number" id="inp" inputmode="decimal" step="0.1" placeholder="réponse">
+        <div class="unit">${r.unit}</div>
+        <button class="btn ok" id="okb" style="min-height:3rem">Valider</button>
+      </div>`;
+    const cv = el.querySelector("canvas");
+    const { ctx, w, h } = mkCanvas(cv);
+    const groundY = h - 24;
+    const Href = r.mode === "v0" ? 32 : 13;
+    const Y = z => groundY - clamp(z, 0, Href) / Href * (groundY - 18);
+    let ball = null, hmax = 0, showMeasure = false, v0used = 0, t0 = 0;
+    const showTarget = r.mode === "v0";
+    function draw(){
+      ctx.clearRect(0, 0, w, h);
+      ctx.fillStyle = "#122b1d"; ctx.fillRect(0, groundY, w, h - groundY);
+      ctx.strokeStyle = "#3ddc97"; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(0, groundY); ctx.lineTo(w, groundY); ctx.stroke();
+      if(showTarget){
+        const y = Y(19.6);
+        ctx.strokeStyle = "#ffd166"; ctx.lineWidth = 2; ctx.setLineDash([6, 5]);
+        ctx.beginPath(); ctx.moveTo(20, y); ctx.lineTo(w - 20, y); ctx.stroke(); ctx.setLineDash([]);
+        ctx.fillStyle = "#ffd166"; ctx.font = "12px system-ui"; ctx.textAlign = "left";
+        ctx.fillText("🎯 cible : 19,6 m", 24, y - 7);
+      }
+      if(ball){
+        ctx.fillStyle = "rgba(63,216,255,.22)";
+        for(let k = 0; k <= 40; k++){
+          const tt = ball.t * k / 40;
+          ctx.beginPath(); ctx.arc(w / 2, Y(v0used * tt - 0.5 * G * tt * tt), 2, 0, 7); ctx.fill();
+        }
+        ctx.fillStyle = "#ff5f8f";
+        ctx.beginPath(); ctx.arc(w / 2, Y(ball.z), 8, 0, 7); ctx.fill();
+      }
+      if(showMeasure){
+        const y = Y(hmax);
+        ctx.strokeStyle = "#3fd8ff"; ctx.setLineDash([4, 4]); ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.moveTo(w / 2 - 46, y); ctx.lineTo(w / 2 + 46, y); ctx.stroke(); ctx.setLineDash([]);
+        ctx.fillStyle = "#3fd8ff"; ctx.font = "bold 12px system-ui"; ctx.textAlign = "center";
+        ctx.fillText("hauteur max = " + fmt(hmax) + " m", w / 2, y - 8);
+      }
+    }
+    function launch(v0){ v0used = v0; ball = { z: 0, t: 0 }; hmax = 0; showMeasure = false; t0 = performance.now(); }
+    sceneLoop(() => {
+      if(ball){
+        const t = (performance.now() - t0) / 1000 * 0.75;
+        const z = v0used * t - 0.5 * G * t * t;
+        hmax = Math.max(hmax, z);
+        if(z <= 0 && t > 0.06){ ball = null; showMeasure = true; }
+        else ball = { z: Math.max(z, 0), t };
+      }
+      draw();
+    });
+    const inp = $("#inp", el);
+    inp.addEventListener("keydown", e => { if(e.key === "Enter"){ e.preventDefault(); $("#okb", el).click(); } });
+    $("#okb", el).onclick = () => {
+      const raw = ($("#inp", el).value || "").replace(",", ".");
+      const val = parseFloat(raw);
+      if(!isFinite(val) || val <= 0){ api.info("Entre une valeur numérique positive 🙂"); return; }
+      if(r.mode === "v0"){
+        const H = val * val / (2 * G);
+        launch(val);
+        if(Math.abs(val - r.sol) <= r.tol){
+          api.correct(`Oui ! v₀ = ${fmt(val)} m/s donne h = v₀²/(2g) = <b>${fmt(H)} m</b> ≈ 19,6 m 🎯`, next);
+        } else {
+          api.wrong(`Avec v₀ = ${fmt(val)} m/s, la balle monte à <b>${fmt(H)} m</b> : ` + (H < 19.6 ? "trop bas !" : "trop haut !") + ` <i>Utilise h = v₀²/(2g), donc v₀ = √(2gh).</i>`);
+        }
+      } else {
+        const v = Math.sqrt(2 * G * val);
+        launch(v);
+        if(Math.abs(val - r.sol) <= r.tol){
+          api.correct(`Bravo ! h = v₀²/(2g) = 14²/(2 × 9,8) = <b>10 m</b> ✅`, next);
+        } else {
+          api.wrong(`Réponse annoncée : ${fmt(val)} m. Relis la formule : h = v₀²/(2g) = 14²/(2 × 9,8) = <b>10 m</b>.`);
+        }
+      }
+    };
+  }
+  render();
+}
+
+/* ---------- 6. Mouvement parabolique ---------- */
+function gPara(el, api){
+  const R = [
+    {D:40, opts:[10, 15, 20, 30], c:2,
+     exp:"portée = v₀²·sin(2α)/g = 20² × 1 / 10 = <b>40 m</b> ✅"},
+    {D:22.5, opts:[12, 15, 18, 25], c:1,
+     exp:"portée = v₀²·sin(2α)/g = 15² / 10 = <b>22,5 m</b> ✅"}
+  ];
+  const alpha = 45 * Math.PI / 180, g = GAME_G;
+  let i = 0;
+  function next(){ i++; i < R.length ? render() : api.toQuiz(); }
+  function render(){
+    stopScene();
+    const r = R[i];
+    el.innerHTML = `
+      <div class="cvwrap" style="height:14rem"><canvas class="cv"></canvas></div>
+      <div class="qtext">Atteins le drapeau 🚩 situé à <b>${fmt(r.D)} m</b>.<br><i>α = 45°, g = 10 m/s². Choisis la vitesse initiale v₀ :</i></div>
+      <div class="opts" id="gopts"></div>`;
+    const cv = el.querySelector("canvas");
+    const { ctx, w, h } = mkCanvas(cv);
+    const groundY = h - 26, XM = 90;
+    const X = x => 16 + clamp(x, 0, XM) / XM * (w - 30);
+    const Y = y => groundY - clamp(y, 0, 46) / 46 * (groundY - 16);
+    let anim = null, landShown = null;
+    function draw(){
+      ctx.clearRect(0, 0, w, h);
+      ctx.fillStyle = "#122b1d"; ctx.fillRect(0, groundY, w, h - groundY);
+      ctx.strokeStyle = "#3ddc97"; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(0, groundY); ctx.lineTo(w, groundY); ctx.stroke();
+      ctx.fillStyle = "#5d6a99"; ctx.font = "10px system-ui"; ctx.textAlign = "center";
+      for(let m = 0; m <= XM; m += 15){
+        ctx.strokeStyle = "rgba(255,255,255,.1)";
+        ctx.beginPath(); ctx.moveTo(X(m), groundY); ctx.lineTo(X(m), groundY + 5); ctx.stroke();
+        ctx.fillText(m + " m", X(m), groundY + 18);
+      }
+      // drapeau
+      ctx.fillStyle = "#cbd5ff"; ctx.fillRect(X(r.D) - 1, groundY - 27, 2, 27);
+      ctx.fillStyle = "#ff5f8f";
+      ctx.beginPath(); ctx.moveTo(X(r.D) + 1, groundY - 27); ctx.lineTo(X(r.D) + 17, groundY - 21); ctx.lineTo(X(r.D) + 1, groundY - 15); ctx.fill();
+      // canon
+      ctx.fillStyle = "#3fd8ff";
+      ctx.beginPath(); ctx.arc(X(0) + 8, groundY - 8, 8, 0, 7); ctx.fill();
+      if(anim){
+        const v0 = anim.v0, tf = anim.tf, t = anim.t * tf;
+        ctx.strokeStyle = "#3fd8ff"; ctx.lineWidth = 2.5; ctx.beginPath();
+        for(let k = 0; k <= 60; k++){
+          const tt = anim.t * tf * k / 60;
+          const x = v0 * Math.cos(alpha) * tt, y = v0 * Math.sin(alpha) * tt - 0.5 * g * tt * tt;
+          const px = X(x), py = Y(Math.max(y, 0));
+          k === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+        }
+        ctx.stroke();
+        const x = v0 * Math.cos(alpha) * t, y = v0 * Math.sin(alpha) * t - 0.5 * g * t * t;
+        ctx.fillStyle = "#ff5f8f"; ctx.beginPath(); ctx.arc(X(x), Y(Math.max(y, 0)), 7, 0, 7); ctx.fill();
+      }
+      if(landShown !== null){
+        ctx.fillStyle = "#ffd166"; ctx.font = "bold 12px system-ui"; ctx.textAlign = "center";
+        ctx.fillText("tombée à " + fmt(landShown) + " m", X(clamp(landShown, 0, XM)), groundY - 38);
+      }
+    }
+    sceneLoop(() => {
+      if(anim){
+        anim.t = clamp((performance.now() - anim.start) / anim.dur, 0, 1);
+        if(anim.t >= 1 && !anim.done){
+          anim.done = true;
+          const land = anim.v0 * anim.v0 * Math.sin(2 * alpha) / g;
+          landShown = land;
+          if(Math.abs(land - r.D) <= 1.5){
+            $$(".opt", el).forEach(b => b.disabled = true);
+            api.correct(r.exp, next);
+          } else {
+            api.wrong(`La balle tombe à <b>${fmt(land)} m</b> au lieu de ${fmt(r.D)} m. <i>portée = v₀²·sin(2α)/g</i>`);
+          }
+        }
+      }
+      draw();
+    });
+    const go = el.querySelector("#gopts");
+    r.opts.forEach((v0, ix) => {
+      const b = document.createElement("button");
+      b.className = "opt";
+      b.innerHTML = `<span class="k">${["A", "B", "C", "D"][ix]}</span><span>v₀ = ${v0} m/s</span>`;
+      b.onclick = () => {
+        if(anim && !anim.done) return;
+        const tf = 2 * v0 * Math.sin(alpha) / g;
+        anim = { v0, tf, t: 0, start: performance.now(), dur: Math.max(tf / 3.2 * 1000, 750), done: false };
+        landShown = null;
+        $$(".opt", go).forEach(x => x.classList.remove("good", "bad"));
+      };
+      go.appendChild(b);
+    });
+  }
+  render();
+}
+
+/* ---------- 7. Frottements ---------- */
+function gFrot(el, api){
+  function renderFit(){
+    stopScene();
+    el.innerHTML = `
+      <div class="cvwrap" style="height:13.5rem"><canvas class="cv"></canvas></div>
+      <div class="qtext">Ajuste τ pour que ta courbe <b>pleine</b> se superpose à la courbe de référence <b>en pointillés</b>.</div>
+      <div class="sl"><label>Temps carac. τ</label><input type="range" id="st" min="0.5" max="8" step="0.5" value="2"><b id="stb">2,0 s</b></div>
+      <div class="calc" id="calc"></div>
+      <button class="btn ok" id="val">✅ Valider ce τ</button>`;
+    const cv = el.querySelector("canvas");
+    const { ctx, w, h } = mkCanvas(cv);
+    const TL = 16, VL = 10, pad = 30;
+    const X = t => pad + t / TL * (w - pad - 12);
+    const Y = v => h - pad - v / VL * (h - pad - 16);
+    let tau = 2;
+    sceneLoop(() => {
+      ctx.clearRect(0, 0, w, h);
+      ctx.strokeStyle = "rgba(255,255,255,.4)"; ctx.lineWidth = 1.5;
+      arrow(ctx, pad, h - pad, w - 6, h - pad, "rgba(255,255,255,.4)", 1.5, 7);
+      arrow(ctx, pad, h - pad, pad, 8, "rgba(255,255,255,.4)", 1.5, 7);
+      ctx.fillStyle = "#98a1d4"; ctx.font = "11px system-ui"; ctx.textAlign = "left";
+      ctx.fillText("t (s)", w - 32, h - pad + 16); ctx.fillText("v (m/s)", pad + 4, 15);
+      ctx.strokeStyle = "rgba(255,255,255,.07)"; ctx.lineWidth = 1;
+      for(let t = 0; t <= TL; t += 4){ ctx.beginPath(); ctx.moveTo(X(t), h - pad); ctx.lineTo(X(t), 12); ctx.stroke(); }
+      // référence (τ = 4)
+      ctx.strokeStyle = "#ffd166"; ctx.setLineDash([5, 5]); ctx.lineWidth = 2; ctx.beginPath();
+      for(let k = 0; k <= 90; k++){ const t = TL * k / 90, v = 10 * Math.exp(-t / 4); k === 0 ? ctx.moveTo(X(t), Y(v)) : ctx.lineTo(X(t), Y(v)); }
+      ctx.stroke(); ctx.setLineDash([]);
+      // courbe joueur
+      ctx.strokeStyle = "#3fd8ff"; ctx.lineWidth = 2.5; ctx.beginPath();
+      for(let k = 0; k <= 90; k++){ const t = TL * k / 90, v = 10 * Math.exp(-t / tau); k === 0 ? ctx.moveTo(X(t), Y(v)) : ctx.lineTo(X(t), Y(v)); }
+      ctx.stroke();
+    });
+    const st = $("#st", el), calc = $("#calc", el);
+    function upd(){
+      tau = +st.value;
+      $("#stb", el).textContent = fmt(tau) + " s";
+      calc.innerHTML = `τ = m / k = ${fmt(tau)} s<br>au bout d’un temps τ : v ≈ 0,37 · v₀`;
+    }
+    st.oninput = upd; upd();
+    $("#val", el).onclick = () => {
+      if(Math.abs(tau - 4) <= 0.55){
+        api.correct(`Parfait ! τ = 4 s. Au bout de 4 s, v ≈ 0,37 × 10 ≈ 3,7 m/s : les deux courbes se superposent 🎯`, renderQ);
+      } else {
+        api.wrong(tau < 4
+          ? `Ta courbe décroît <b>trop vite</b> : τ est trop petit. Il faut une décroissance plus lente.`
+          : `Ta courbe décroît <b>trop lentement</b> : τ est trop grand.`);
+      }
+    };
+  }
+  function renderQ(){
+    stopScene();
+    const q = {
+      q:"Une sphère (m = 6 kg) lancée à v₀ = 12 m/s subit f = −k·v avec k = 3 kg/s. Quelle est sa vitesse après t = 2 s ?",
+      a:["≈ 4,4 m/s", "6,0 m/s", "2,2 m/s", "12 m/s"], c:0,
+      exp:"τ = m/k = 6/3 = 2 s. Or t = 2 s = τ, donc v = v₀·e⁻¹ = 12 × 0,37 ≈ <b>4,4 m/s</b>."
+    };
+    el.innerHTML = `<div class="qtext">${q.q}</div><div class="opts" id="gopts"></div>`;
+    renderOpts($("#gopts", el), q, api, () => api.toQuiz());
+  }
+  renderFit();
+}
+
+/* ---------- 8. Galilée ---------- */
+function gGal(el, api){
+  const R = [
+    {q:"Tu marches à 2 m/s vers l’<b>avant</b> dans un train qui roule à 30 m/s. Ta vitesse par rapport au sol ?",
+     a:["28 m/s", "30 m/s", "32 m/s", "60 m/s"], c:2,
+     exp:"v_sol = v_train + v_marche = 30 + 2 = <b>32 m/s</b>."},
+    {q:"Même train, mais tu marches à 2 m/s vers l’<b>arrière</b>. Ta vitesse par rapport au sol ?",
+     a:["32 m/s", "28 m/s", "2 m/s", "0 m/s"], c:1,
+     exp:"On soustrait : 30 − 2 = <b>28 m/s</b>. Le sens de la marche change le signe de la vitesse relative."},
+    {q:"Deux trains roulent dans le <b>même sens</b> : A à 30 m/s et B à 20 m/s. Quelle est la vitesse de A <b>par rapport à B</b> ?",
+     a:["10 m/s", "50 m/s", "−10 m/s", "20 m/s"], c:0,
+     exp:"v(A/B) = v(A/sol) − v(B/sol) = 30 − 20 = <b>10 m/s</b>."}
+  ];
+  let i = 0;
+  function render(){
+    stopScene();
+    const r = R[i];
+    el.innerHTML = `<div class="cvwrap" style="height:11rem"><canvas class="cv"></canvas></div>
+      <div class="qtext">${r.q}</div><div class="opts" id="gopts"></div>`;
+    const cv = el.querySelector("canvas");
+    const { ctx, w, h } = mkCanvas(cv);
+    const gy = h - 24, t0 = performance.now();
+    sceneLoop(() => {
+      const t = (performance.now() - t0) / 1000;
+      ctx.clearRect(0, 0, w, h);
+      ctx.fillStyle = "#101d2e"; ctx.fillRect(0, gy, w, h - gy);
+      ctx.strokeStyle = "#3ddc97"; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(w, gy); ctx.stroke();
+      ctx.strokeStyle = "rgba(255,255,255,.15)"; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(0, gy + 8); ctx.lineTo(w, gy + 8); ctx.stroke();
+      const span = w + 190;
+      const xa = ((t * 100) % span) - 150;
+      const xb = ((t * 66) % span) - 150;
+      // train A
+      rr(ctx, xa, gy - 58, 150, 50, 9); ctx.fillStyle = "#245e9e"; ctx.fill();
+      for(let k = 0; k < 3; k++){ rr(ctx, xa + 12 + k * 40, gy - 40, 30, 20, 4); ctx.fillStyle = "#bfe3ff"; ctx.fill(); }
+      ctx.fillStyle = i === 1 ? "#ff5f8f" : "#ffd166";
+      ctx.beginPath(); ctx.arc(xa + 12 + 40 + 15, gy - 30, 6, 0, 7); ctx.fill();
+      arrow(ctx, xa + 70, gy - 68, xa + 112, gy - 68, "#3fd8ff", 3, 8);
+      ctx.fillStyle = "#3fd8ff"; ctx.font = "11px system-ui"; ctx.textAlign = "center";
+      ctx.fillText("30 m/s", xa + 92, gy - 74);
+      const dir = i === 1 ? -1 : 1;
+      arrow(ctx, xa + 12 + 40 + 15, gy - 14, xa + 12 + 40 + 15 + dir * 22, gy - 14, "#ff9f43", 3, 7);
+      ctx.fillStyle = "#ff9f43";
+      ctx.fillText((i === 1 ? "−" : "+") + "2 m/s", xa + 12 + 40 + 15 + dir * 36, gy - 8);
+      if(i === 2){
+        rr(ctx, xb, gy - 52, 150, 44, 9); ctx.fillStyle = "#8a3a54"; ctx.fill();
+        for(let k = 0; k < 3; k++){ rr(ctx, xb + 12 + k * 40, gy - 36, 30, 17, 4); ctx.fillStyle = "#ffd7e2"; ctx.fill(); }
+        arrow(ctx, xb + 70, gy - 60, xb + 108, gy - 60, "#ff5f8f", 3, 8);
+        ctx.fillStyle = "#ff5f8f"; ctx.fillText("20 m/s", xb + 90, gy - 66);
+      }
+      ctx.fillStyle = "#98a1d4"; ctx.font = "10px system-ui"; ctx.textAlign = "center";
+      ctx.fillText("référentiel du sol (terrestre)", w / 2, h - 6);
+    });
+    renderOpts($("#gopts", el), r, api, () => { i++; i < R.length ? render() : api.toQuiz(); });
+  }
+  render();
+}
+
+const GAMES = { ref:gRef, vitesse:gVit, mrua:gMrua, graphes:gGraph, vertical:gVert, parabolique:gPara, frottements:gFrot, galilee:gGal };
+
+/* ============================================================
+   4) PROGRESSION / ÉCRANS / LOGIQUE
+   ============================================================ */
+let progress = {};
+try{ progress = JSON.parse(localStorage.getItem("cinema_prog") || "{}") || {}; }catch(e){ progress = {}; }
+function save(){ try{ localStorage.setItem("cinema_prog", JSON.stringify(progress)); }catch(e){} }
+function totalStars(){ return Object.values(progress).reduce((a, b) => a + b, 0); }
+
+const S = { lvl:0, hearts:3, quizI:0, quizSet:[], quizScore:0, isFinal:false };
+
+function paintHearts(){
+  const s = HRT_ON.repeat(Math.max(0, S.hearts)) + HRT_OFF.repeat(Math.max(0, 3 - S.hearts));
+  $("#gameHearts").textContent = s;
+  $("#quizHearts").textContent = s;
+}
+function fb(msg, cls){
+  const el = $("#gameFb");
+  el.className = "fb show " + cls;
+  el.innerHTML = msg;
+  el.scrollIntoView({ behavior:"smooth", block:"nearest" });
+}
+function fbHide(){ $("#gameFb").className = "fb"; }
+
+/* ---------- API passée aux mini-jeux ---------- */
+const API = {
+  correct(msg, next){
+    beep(true);
+    fb("✅ " + msg, "ok");
+    after(1550, () => (next || API.toQuiz)());
+    return true;
+  },
+  wrong(msg){
+    S.hearts = Math.max(0, S.hearts - 1);
+    paintHearts();
+    beep(false);
+    fb("❌ " + msg, "ko");
+    if(S.hearts <= 0){ after(1200, gameOver); return false; }
+    return true;
+  },
+  info(msg){ fb("ℹ️ " + msg, "info"); },
+  toQuiz(){ startQuiz(); }
+};
+
+/* ---------- overlay ---------- */
+function openOvl(html){ $("#ovlBox").innerHTML = html; $("#ovl").classList.add("show"); }
+function closeOvl(){ $("#ovl").classList.remove("show"); }
+$("#ovl").addEventListener("click", e => {
+  const b = e.target.closest("[data-ovl]"); if(!b) return;
+  const a = b.dataset.ovl; closeOvl();
+  if(a === "map"){ renderMap(); show("scr-map"); }
+  else if(a === "retry"){ S.isFinal ? startFinal() : startLevel(S.lvl); }
+  else if(a === "fiche"){ show("scr-fiche"); }
+  else if(a === "reset"){ progress = {}; save(); renderHome(); renderMap(); show("scr-home"); }
+  else if(a === "quit"){ renderMap(); show("scr-map"); }
+});
+function gameOver(){
+  beep(false);
+  openOvl(`<div class="big">💔</div><h3>Plus de vies !</h3>
+    <p>Pas de panique&nbsp;: relis la fiche de révision, puis retente le niveau. Tu vas y arriver&nbsp;!</p>
+    <div class="stack">
+      <button class="btn ok" data-ovl="retry">↻ Recommencer</button>
+      <button class="btn ghost" data-ovl="fiche">📋 Relire la fiche</button>
+      <button class="btn" data-ovl="map">🗺️ Carte des niveaux</button>
+    </div>`);
+}
+
+/* ---------- écran d’accueil ---------- */
+function renderHome(){
+  const done = Object.keys(progress).length;
+  $("#homeStats").innerHTML = `⭐ <b>${totalStars()}</b>/24 étoiles &nbsp;·&nbsp; <b>${done}</b>/8 niveaux`;
+  $("#btnPlay").textContent = done === 0 ? "▶ Commencer l’aventure" : "▶ Continuer l’aventure";
+  $("#btnSound").textContent = soundOn ? "🔊 Son : on" : "🔇 Son : off";
+}
+
+/* ---------- carte des niveaux ---------- */
+function renderMap(){
+  const grid = $("#mapGrid");
+  grid.innerHTML = "";
+  LEVELS.forEach((L, i) => {
+    const unlocked = i === 0 || progress[i - 1] !== undefined;
+    const st = progress[i];
+    const b = document.createElement("button");
+    b.className = "tile" + (unlocked ? "" : " locked") + (st !== undefined ? " done" : "");
+    b.innerHTML = `<span class="ic">${unlocked ? L.icon : "🔒"}</span>
+      <span class="nm">${L.title}</span>
+      <span class="st">${unlocked ? (st !== undefined ? "⭐".repeat(st) + "✩".repeat(3 - st) : "à jouer") : "verrouillé"}</span>`;
+    b.onclick = () => {
+      if(!unlocked){ beep(false); b.classList.add("shake"); setTimeout(()=>b.classList.remove("shake"), 320); return; }
+      startLevel(i);
+    };
+    grid.appendChild(b);
+  });
+  const done = progress[7] !== undefined;
+  const f = document.createElement("button");
+  f.className = "tile final" + (done ? "" : " locked");
+  f.innerHTML = `<span class="ic">${done ? "🏆" : "🔒"}</span><span class="nm">Défi final & diplôme</span><span class="st">${done ? "à toi de jouer" : "niveau 8 requis"}</span>`;
+  f.onclick = () => { if(!done){ beep(false); return; } startFinal(); };
+  grid.appendChild(f);
+  $("#mapProg").textContent = totalStars() + "/24 ⭐";
+}
+
+/* ---------- cours complet & fiche ---------- */
+function buildCourse(){
+  $("#courseBody").innerHTML =
+    `<p class="lead">Tout le programme de <b>cinématique</b> de Terminale spécialité, du référentiel jusqu’aux mouvements avec frottements. Chaque partie correspond à un niveau du jeu. 📖</p>` +
+    LEVELS.map((L, i) => `
+      <div class="sec">
+        <h2><span class="si">${L.icon}</span> ${i + 1}. ${L.title}<span class="n">${L.tag}</span></h2>
+        ${L.lesson.map(b => `<div class="card"><div class="ct">${b.h}</div><p>${b.p}</p>${(b.f || []).map(x => `<div class="f">${x}</div>`).join("")}</div>`).join("")}
+      </div>`).join("") +
+    `<div class="sec"><h2><span class="si">🧠</span> À retenir absolument</h2>
+      <div class="card"><p>Les 3 équations du MRUA, la flèche <b>h = v₀²/(2g)</b> du tir vertical et l’équation de la parabole sont les formules les plus utilisées au bac. La fiche de révision les regroupe toutes.</p></div>
+      <div class="stack"><button class="btn" onclick="show('scr-fiche')">📋 Ouvrir la fiche de révision</button></div></div>`;
+}
+function buildFiche(){
+  $("#ficheBody").innerHTML =
+    FICHE.map(s => `<div class="card"><div class="ct">${s.h}</div>${s.f.map(x => `<div class="f">${x}</div>`).join("")}</div>`).join("") +
+    `<div class="card"><div class="ct">🚨 Pièges fréquents</div>${TRAPS.map(t => `<div class="trap">${t}</div>`).join("")}</div>
+     <p class="muted" style="margin:.4rem 0 1.4rem">Bonne révision&nbsp;! 💪</p>`;
+}
+
+/* ---------- lancement d’un niveau ---------- */
+function startLevel(i){
+  S.lvl = i; S.hearts = 3; S.isFinal = false;
+  const L = LEVELS[i];
+  $("#lesTtl").textContent = L.icon + " " + L.title;
+  $("#lesNum").textContent = L.tag;
+  $("#lesBody").innerHTML = L.lesson.map(b =>
+    `<div class="card"><div class="ct">${b.h}</div><p>${b.p}</p>${(b.f || []).map(x => `<div class="f">${x}</div>`).join("")}</div>`).join("");
+  $("#btnToGame").onclick = startGame;
+  show("scr-lesson");
+}
+
+function startGame(){
+  S.hearts = 3;
+  paintHearts();
+  const L = LEVELS[S.lvl];
+  $("#gameTtl").textContent = L.icon + " " + L.title;
+  fbHide();
+  const body = $("#gameBody");
+  body.innerHTML = "";
+  show("scr-game");
+  GAMES[L.game](body, API);
+}
+
+/* ---------- quiz ---------- */
+function startQuiz(){
+  S.quizI = 0; S.quizScore = 0; S.isFinal = false;
+  S.quizSet = LEVELS[S.lvl].quiz;
+  paintHearts();
+  show("scr-quiz");
+  renderQuiz();
+}
+function renderQuiz(){
+  const q = S.quizSet[S.quizI];
+  const n = S.quizSet.length;
+  $("#quizCount").textContent = "Quiz · question " + (S.quizI + 1) + "/" + n;
+  const body = $("#quizBody");
+  body.innerHTML = `<div class="qtext" style="margin-top:.2rem">${q.q}</div><div class="opts" id="qopts"></div>`;
+  const opts = $("#qopts", body);
+  let answered = false;
+  q.a.forEach((txt, idx) => {
+    const b = document.createElement("button");
+    b.className = "opt";
+    b.innerHTML = `<span class="k">${["A","B","C","D"][idx]}</span><span>${txt}</span>`;
+    b.onclick = () => {
+      if(answered) return;
+      answered = true;
+      if(idx === q.c){ b.classList.add("good"); S.quizScore++; beep(true); }
+      else { b.classList.add("bad"); S.hearts = Math.max(0, S.hearts - 1); paintHearts(); beep(false); const g = opts.children[q.c]; if(g) g.classList.add("good"); }
+      $$(".opt", opts).forEach(x => x.disabled = true);
+      const d = document.createElement("div");
+      d.className = "expl";
+      d.innerHTML = (idx === q.c ? "✅ <b>Bonne réponse !</b><br>" : "❌ <b>Pas tout à fait.</b><br>") + (q.exp || "");
+      body.appendChild(d);
+      const nb = document.createElement("button");
+      nb.className = "btn big"; nb.style.marginTop = ".9rem";
+      if(S.hearts <= 0 && S.quizI < S.quizSet.length){
+        nb.textContent = "↻ Recommencer le niveau";
+        nb.onclick = gameOver;
+      } else {
+        nb.textContent = (S.quizI < n - 1) ? "Question suivante →" : "🏁 Voir mon résultat";
+        nb.onclick = () => { S.quizI++; S.quizI < n ? renderQuiz() : endLevel(); };
+      }
+      body.appendChild(nb);
+      after(60, () => nb.scrollIntoView({ behavior:"smooth", block:"end" }));
+    };
+    opts.appendChild(b);
+  });
+  body.scrollTop = 0;
+}
+
+function endLevel(){
+  if(S.isFinal){ showDiploma(); return; }
+  progress[S.lvl] = Math.max(progress[S.lvl] || 0, S.hearts);
+  save();
+  renderResult();
+}
+
+function renderResult(){
+  const st = progress[S.lvl];
+  const L = LEVELS[S.lvl];
+  $("#resBody").innerHTML = `
+    <div class="stars">${"⭐".repeat(st)}${"✩".repeat(3 - st)}</div>
+    <div class="rtitle">${L.icon} Niveau réussi !</div>
+    <div class="rtext"><b>${L.title}</b><br>${st} étoile${st > 1 ? "s" : ""} gagnée${st > 1 ? "s" : ""}. ${st < 3 ? "Retente pour décrocher les 3 ⭐ !" : "Sans faute, chapeau ! 🎉"}</div>
+    <div class="rscore"><span class="chip">Total <b>${totalStars()}</b>/24 ⭐</span></div>`;
+  const btns = $("#resBtns");
+  btns.innerHTML = "";
+  const isLast = S.lvl === LEVELS.length - 1;
+  const nxt = document.createElement("button");
+  nxt.className = "btn big";
+  nxt.textContent = isLast ? "🏆 Défi final & diplôme" : "Niveau suivant →";
+  nxt.onclick = () => isLast ? startFinal() : startLevel(S.lvl + 1);
+  btns.appendChild(nxt);
+  const retry = document.createElement("button");
+  retry.className = "btn"; retry.textContent = "↻ Refaire ce niveau";
+  retry.onclick = () => startLevel(S.lvl);
+  btns.appendChild(retry);
+  const map = document.createElement("button");
+  map.className = "btn ghost"; map.textContent = "🗺️ Carte des niveaux";
+  map.onclick = () => { renderMap(); show("scr-map"); };
+  btns.appendChild(map);
+  show("scr-result");
+}
+
+/* ---------- défi final & diplôme ---------- */
+function startFinal(){
+  const pool = [];
+  LEVELS.forEach(L => L.quiz.forEach(q => pool.push(q)));
+  S.quizSet = shuffle(pool).slice(0, 6);
+  S.quizI = 0; S.quizScore = 0; S.isFinal = true; S.hearts = 3;
+  paintHearts();
+  show("scr-quiz");
+  renderQuiz();
+}
+function showDiploma(){
+  const sc = S.quizScore, n = S.quizSet.length;
+  const msg = sc === n ? "Sans faute ! Tu maîtrises vraiment la cinématique 🎓"
+    : sc >= Math.ceil(n / 2) ? "Beau parcours, tu as les bases solides sur ce chapitre !"
+    : "Bonne tentative : relis la fiche puis retente le défi, tu vas progresser vite.";
+  $("#finBody").innerHTML = `
+    <div style="font-size:3.4rem">🎓</div>
+    <div class="rtitle">Diplôme de cinématique</div>
+    <div class="rtext">Voyage terminé : référentiels, vecteurs position/vitesse/accélération, MRUA, graphiques, tir vertical, mouvement parabolique, frottements et référentiels galiléens.</div>
+    <div class="rscore">
+      <span class="chip">Défi final <b>${sc}</b>/${n}</span>
+      <span class="chip">Étoiles <b>${totalStars()}</b>/24 ⭐</span>
+    </div>
+    <div class="rtext">${msg}</div>`;
+  const btns = $("#finBtns");
+  btns.innerHTML = "";
+  const b1 = document.createElement("button");
+  b1.className = "btn big"; b1.textContent = "📋 Revoir la fiche";
+  b1.onclick = () => show("scr-fiche");
+  btns.appendChild(b1);
+  const b2 = document.createElement("button");
+  b2.className = "btn"; b2.textContent = "🔁 Refaire le défi final";
+  b2.onclick = startFinal;
+  btns.appendChild(b2);
+  const b3 = document.createElement("button");
+  b3.className = "btn ghost"; b3.textContent = "🗺️ Carte des niveaux";
+  b3.onclick = () => { renderMap(); show("scr-map"); };
+  btns.appendChild(b3);
+  show("scr-final");
+}
+
+/* ============================================================
+   MODULE EXERCICES + CRÉDITS / CONTACT  (fusion v1 + v2)
+   ============================================================ */
+(function(){
+"use strict";
+const $id = id => document.getElementById(id);
+
+/* ---------- SIGNATURE / CONTACT (informations fixes) ---------- */
+const AUTHOR    = "Toby";
+const WA_INTL   = "22871254600";        // international sans "+"
+const WA_DISPLAY = "+228 71 25 46 00";
+const _sig = [0x54,0x6f,0x62,0x79];     // "Toby" (garde une trace de l'auteur)
+function author(){ return String.fromCharCode.apply(null,_sig); }
+
+/* ---------- visages de notation (triste → très heureux) ---------- */
+const RATE_FACES = [
+  { e:"😢", t:"Triste",        c:"#7fb2ff" },
+  { e:"🙁", t:"Pas content",   c:"#ff8a5c" },
+  { e:"😐", t:"Moyen",         c:"#ffd166" },
+  { e:"🙂", t:"Souri",         c:"#8bd88f" },
+  { e:"😄", t:"Très heureux",  c:"#3ddc97" }
+];
+function ratingLine(){
+  if(!E.rating) return "Ma note de l'appli : (pas encore notée)";
+  const f = RATE_FACES[E.rating-1];
+  return "Ma note de l'appli : "+E.rating+"/5 ⭐"+(f?(" ("+f.e+" "+f.t+")"):"");
+}
+/* ---------- matières souhaitées comme futur jeu ---------- */
+const WISH_SUBJECTS = ["Mathématiques","Chimie","Informatique / NSI","SVT","Anglais","Histoire-Géo","Philosophie","Français","SES / Économie"];
+function wishesLine(){
+  const parts = (E.wishes||[]).slice();
+  if(E.wishOther && E.wishOther.trim()) parts.push("Autre : "+E.wishOther.trim());
+  if(!parts.length) return "Matières souhaitées en jeu : (pas encore choisi)";
+  return "Matières souhaitées en jeu : "+parts.join(", ");
+}
+
+/* ============================================================
+   DONNÉES DES 40 EXERCICES (8 niveaux de difficulté)
+   ============================================================ */
+const TIERS = [];
+/* helper de création d’exercice */
+function ex(q, ans, unit, tol, hint, sol){ return { q, ans, unit, tol, hint, sol }; }
+
+/* ---------- 0 · FACILE 🟢 ---------- */
+TIERS.push({
+  name:"Facile", emoji:"🟢", color:"#3ddc97", sub:"Échauffement — une formule, un calcul direct",
+  ex:[
+    ex("Un mobile a pour équation horaire <b>x(t) = 5·t + 2</b> (x en m, t en s). Quelle est sa vitesse <b>v</b> ?",
+      5, "m/s", 0.01,
+      "Une équation du type x(t) = v·t + x₀ : la vitesse est le coefficient devant t.",
+      ["x(t) = v·t + x₀", "On identifie le coefficient de t : v = 5 m/s", "<b>v = 5 m/s</b> (mouvement rectiligne uniforme)"]),
+    ex("Un cycliste roule à vitesse constante <b>v = 4 m/s</b>. Parti de x₀ = 0, quelle distance a-t-il parcourue à <b>t = 3 s</b> ?",
+      12, "m", 0.1,
+      "En mouvement uniforme : x = v·t.",
+      ["x(t) = v × t", "x = 4 × 3", "<b>x = 12 m</b>"]),
+    ex("Un mobile en MRUA part avec <b>v₀ = 0</b> et <b>a = 3 m/s²</b>. Quelle est sa vitesse à <b>t = 4 s</b> ?",
+      12, "m/s", 0.1,
+      "v(t) = v₀ + a·t",
+      ["v(t) = v₀ + a·t", "v = 0 + 3 × 4", "<b>v = 12 m/s</b>"]),
+    ex("On lâche une balle (chute libre). On prend <b>g = 10 m/s²</b>. Quelle est sa vitesse au bout de <b>3 s</b> ?",
+      30, "m/s", 0.1,
+      "Chute libre : la vitesse augmente de g chaque seconde.",
+      ["v(t) = g × t", "v = 10 × 3", "<b>v = 30 m/s</b>"]),
+    ex("Un piéton parcourt <b>100 m</b> en <b>20 s</b> à vitesse constante. Quelle est sa vitesse moyenne ?",
+      5, "m/s", 0.05,
+      "v = Δx / Δt",
+      ["v = Δx / Δt", "v = 100 / 20", "<b>v = 5 m/s</b>"])
+  ]
+});
+
+/* ---------- 1 · SIMPLE 🟩 ---------- */
+TIERS.push({
+  name:"Simple", emoji:"🟩", color:"#7bd88f", sub:"Application directe + attention aux signes",
+  ex:[
+    ex("Un mobile a pour équation <b>x(t) = −4·t + 10</b>. Quelle est sa vitesse (avec son signe) ?",
+      -4, "m/s", 0.01,
+      "Même méthode que pour x = v·t + x₀ : le coefficient de t est la vitesse.",
+      ["x(t) = v·t + x₀ → v = −4 m/s", "Le signe « − » signifie que le mobile se déplace <b>dans le sens opposé</b> à l’axe Ox.", "<b>v = −4 m/s</b>"]),
+    ex("MRUA : <b>v₀ = 2 m/s</b>, <b>a = 1,5 m/s²</b>, x₀ = 0. Quelle est la position du mobile à <b>t = 4 s</b> ?",
+      20, "m", 0.15,
+      "x(t) = x₀ + v₀·t + ½·a·t²",
+      ["x(t) = x₀ + v₀·t + ½·a·t²", "x = 0 + 2×4 + ½ × 1,5 × 4²", "x = 8 + 12", "<b>x = 20 m</b>"]),
+    ex("Chute libre avec <b>g = 9,8 m/s²</b>, lâchée sans vitesse de <b>20 m</b> de haut. Quelle vitesse à l’arrivée au sol ?",
+      19.8, "m/s", 0.25,
+      "v² = v₀² + 2·g·h avec v₀ = 0.",
+      ["v² = 2·g·h = 2 × 9,8 × 20 = 392", "v = √392", "<b>v ≈ 19,8 m/s</b>"]),
+    ex("Un train roule à vitesse constante <b>15 m/s</b>. Quelle distance parcourt-il en <b>4 s</b> ?",
+      60, "m", 0.1,
+      "x = v·t",
+      ["x = v × t = 15 × 4", "<b>x = 60 m</b>"]),
+    ex("Sur un graphique x(t), qui est une droite, x passe de 0 à <b>30 m</b> entre t = 0 et <b>t = 10 s</b>. Quelle est la vitesse ?",
+      3, "m/s", 0.05,
+      "Sur x(t), la vitesse est la pente de la droite : v = Δx / Δt.",
+      ["v = Δx / Δt", "v = (30 − 0) / (10 − 0)", "<b>v = 3 m/s</b>"])
+  ]
+});
+
+/* ---------- 2 · MOYEN 🟡 ---------- */
+TIERS.push({
+  name:"Moyen", emoji:"🟡", color:"#ffd166", sub:"Deux étapes de raisonnement",
+  ex:[
+    ex("Une voiture roule à <b>v₀ = 10 m/s</b> et freine avec une accélération <b>a = −2 m/s²</b>. Quelle est sa distance d’arrêt ?",
+      25, "m", 0.2,
+      "On cherche Δx tel que v = 0 : utilise v² = v₀² + 2·a·Δx.",
+      ["v² = v₀² + 2·a·Δx avec v = 0", "0 = 100 + 2 × (−2) × d → 4d = 100", "<b>d = 25 m</b>"]),
+    ex("Chute libre depuis <b>45 m</b> (g = 10 m/s²). Quelle est la durée de la chute ?",
+      3, "s", 0.05,
+      "h = ½·g·t² → t = √(2h/g)",
+      ["h = ½·g·t²", "t = √(2h/g) = √(90/10) = √9", "<b>t = 3 s</b>"]),
+    ex("Tir vertical : <b>v₀ = 20 m/s</b>, <b>g = 10 m/s²</b>. Quelle est la hauteur maximale atteinte (la flèche) ?",
+      20, "m", 0.2,
+      "Au sommet v = 0 : h = v₀² / (2g).",
+      ["v² = v₀² − 2·g·h et v = 0 au sommet", "h = v₀²/(2g) = 400/20", "<b>h = 20 m</b>"]),
+    ex("Sur un graphique, la vitesse d’un mobile vaut <b>v(t) = 2·t</b> (v en m/s). Quel est son déplacement entre <b>t = 0 et t = 5 s</b> ?",
+      25, "m", 0.2,
+      "Le déplacement est l’aire sous la courbe v(t). Ici c’est un triangle.",
+      ["v(5) = 10 m/s", "aire = ½ × base × hauteur = ½ × 5 × 10", "<b>Δx = 25 m</b>"]),
+    ex("Frottements fluides : <b>v(t) = 8·e^(−t/3)</b>. Quelle est la vitesse à <b>t = 3 s</b> ?",
+      2.94, "m/s", 0.12,
+      "Ici τ = 3 s : à t = τ, la vitesse vaut v₀·e⁻¹ ≈ 0,37·v₀.",
+      ["τ = 3 s, donc à t = 3 s on a t = τ", "v = v₀ · e⁻¹ = 8 × 0,368", "<b>v ≈ 2,94 m/s</b>"])
+  ]
+});
+
+/* ---------- 3 · MIDDLE 🟠 ---------- */
+TIERS.push({
+  name:"Middle", emoji:"🟠", color:"#ffb84d", sub:"Formules combinées — niveau bac",
+  ex:[
+    ex("MRUA : <b>v₀ = 5 m/s</b>, <b>a = 3 m/s²</b>, le mobile parcourt <b>Δx = 12 m</b>. Quelle est sa vitesse finale ?",
+      9.85, "m/s", 0.15,
+      "Utilise la formule sans le temps : v² = v₀² + 2·a·Δx.",
+      ["v² = v₀² + 2·a·Δx = 25 + 2×3×12 = 25 + 72 = 97", "v = √97", "<b>v ≈ 9,85 m/s</b>"]),
+    ex("Projectile : <b>v₀ = 20 m/s</b>, <b>α = 30°</b>, <b>g = 10 m/s²</b>. Quelle est la flèche (hauteur maximale) ?",
+      5, "m", 0.15,
+      "h = v₀²·sin²α / (2g). Rappel : sin 30° = 0,5.",
+      ["sin 30° = 0,5 → sin²α = 0,25", "h = 400 × 0,25 / (2 × 10) = 100/20", "<b>h = 5 m</b>"]),
+    ex("Projectile : <b>v₀ = 20 m/s</b>, <b>α = 45°</b>, <b>g = 10 m/s²</b>. Quelle est la portée ?",
+      40, "m", 0.3,
+      "Portée = v₀²·sin(2α)/g. Rappel : sin 90° = 1.",
+      ["2α = 90° → sin(2α) = 1", "P = 400 × 1 / 10", "<b>P = 40 m</b>"]),
+    ex("Une balle lancée verticalement monte jusqu’à <b>20 m</b> (g = 10 m/s²). Quelle était sa vitesse initiale ?",
+      20, "m/s", 0.2,
+      "Au sommet : v₀² = 2·g·h.",
+      ["h = v₀²/(2g) → v₀² = 2·g·h", "v₀² = 2 × 10 × 20 = 400", "<b>v₀ = 20 m/s</b>"]),
+    ex("La vitesse d’un mobile passe de <b>10 m/s</b> à <b>4 m/s</b> entre t = 0 et <b>t = 6 s</b> (droite). Quelle est son accélération (avec son signe) ?",
+      -1, "m/s²", 0.05,
+      "a est la pente du graphique v(t) : a = Δv / Δt.",
+      ["a = Δv / Δt = (4 − 10) / (6 − 0)", "a = −6 / 6", "<b>a = −1 m/s²</b> : le mobile ralentit."])
+  ]
+});
+
+/* ---------- 4 · DUR 🔴 ---------- */
+TIERS.push({
+  name:"Dur", emoji:"🔴", color:"#ff8a5c", sub:"Calculs complets, plusieurs formules",
+  ex:[
+    ex("Projectile : <b>v₀ = 30 m/s</b>, <b>α = 45°</b>, <b>g = 9,8 m/s²</b>. Quelle est la portée ?",
+      91.8, "m", 1,
+      "Portée = v₀²·sin(2α)/g ; pour α = 45°, sin(2α) = 1.",
+      ["2α = 90° → sin(2α) = 1", "P = 30² / 9,8 = 900/9,8", "<b>P ≈ 91,8 m</b>"]),
+    ex("Une voiture accélère de <b>0 à 30 m/s</b> en <b>10 s</b> (a constant), puis freine à <b>5 m/s²</b> jusqu’à l’arrêt. Quelle distance totale parcourt-elle ?",
+      240, "m", 1.5,
+      "Phase 1 : MRUA, d₁ = ½·v·t. Phase 2 : freinage, d₂ = v²/(2a).",
+      ["Phase 1 (v₀=0) : d₁ = ½ × 30 × 10 = 150 m", "Phase 2 : d₂ = 30² / (2 × 5) = 900/10 = 90 m", "d = 150 + 90", "<b>d = 240 m</b>"]),
+    ex("Frottements fluides : le temps caractéristique vaut <b>τ = 2 s</b> et <b>k = 4 kg/s</b>. Quelle est la masse m du mobile ?",
+      8, "kg", 0.05,
+      "τ = m / k, donc m = τ × k.",
+      ["τ = m/k", "m = τ × k = 2 × 4", "<b>m = 8 kg</b>"]),
+    ex("Un objet est lâché de <b>45 m</b> (g = 10 m/s²). Quelle distance parcourt-il pendant la <b>dernière seconde</b> de sa chute ?",
+      25, "m", 0.5,
+      "La chute dure 3 s. Calcule la vitesse à t = 2 s, puis la distance de la 3ᵉ seconde.",
+      ["Durée totale : t = √(2×45/10) = 3 s", "À t = 2 s : v = g·t = 20 m/s", "Dernière seconde : d = v·1 + ½×10×1² = 20 + 5", "<b>d = 25 m</b>"]),
+    ex("Un mobile a pour équation horaire <b>x(t) = 2·t²</b> (m). Quelle est son accélération ?",
+      4, "m/s²", 0.05,
+      "L’accélération est la dérivée de la vitesse, elle-même dérivée de la position.",
+      ["v(t) = dx/dt = 4·t", "a(t) = dv/dt = 4", "<b>a = 4 m/s²</b>"]),
+  ]
+});
+
+/* ---------- 5 · HARD 🟥 ---------- */
+TIERS.push({
+  name:"Hard", emoji:"🟥", color:"#ff5f8f", sub:"Problèmes type bac, raisonnement complet",
+  ex:[
+    ex("Un projectile est lancé à <b>α = 45°</b> et doit atteindre une cible à <b>50 m</b> (g = 10 m/s²). Quelle vitesse initiale v₀ faut-il ?",
+      22.4, "m/s", 0.3,
+      "Pour α = 45°, la portée se simplifie : P = v₀²/g.",
+      ["P = v₀²·sin(2α)/g avec sin(2α)=1", "v₀² = P × g = 50 × 10 = 500", "<b>v₀ = √500 ≈ 22,4 m/s</b>"]),
+    ex("Deux mobiles MRU vont l’un vers l’autre : A part de x = 0 à <b>20 m/s</b>, B part de x = 300 m à <b>10 m/s</b> (vers A). Au bout de combien de temps se croisent-ils ?",
+      10, "s", 0.15,
+      "Ils se croisent quand x_A = x_B. Écris les deux équations horaires.",
+      ["x_A = 20·t   et   x_B = 300 − 10·t", "20t = 300 − 10t → 30t = 300", "<b>t = 10 s</b> (ils se croisent à x = 200 m)"]),
+    ex("Une balle est lancée vers le haut à <b>15 m/s</b> depuis une hauteur de <b>20 m</b> (g = 10 m/s²). Au bout de combien de temps touche-t-elle le sol ?",
+      4, "s", 0.1,
+      "On résout z(t) = 0 avec z(t) = 20 + 15·t − ½·g·t².",
+      ["20 + 15·t − 5·t² = 0 → 5t² − 15t − 20 = 0", "t² − 3t − 4 = 0 = (t − 4)(t + 1)", "On garde la solution positive : <b>t = 4 s</b>"]),
+    ex("Frottements exponentiels : τ = <b>4 s</b> et masse m = <b>2 kg</b>. Quelle est la constante de frottement k ?",
+      0.5, "kg/s", 0.02,
+      "τ = m / k.",
+      ["τ = m/k → k = m/τ", "k = 2 / 4", "<b>k = 0,5 kg/s</b>"]),
+    ex("Un train ralentit de <b>25 m/s</b> jusqu’à l’arrêt sur une distance de <b>250 m</b>. Quelle est la valeur (positive) de son accélération ?",
+      1.25, "m/s²", 0.05,
+      "v² = v₀² + 2·a·d avec v = 0 ; on demande |a|.",
+      ["0 = v₀² + 2·a·d → |a| = v₀²/(2d)", "|a| = 625 / (2 × 250) = 625/500", "<b>|a| = 1,25 m/s²</b>"])
+  ]
+});
+
+/* ---------- 6 · EXPERT 🟣 ---------- */
+TIERS.push({
+  name:"Expert", emoji:"🟣", color:"#b07bff", sub:"Analyses fines et applications croisées",
+  ex:[
+    ex("Un ballon est frappé à <b>v₀ = 20 m/s</b> sous <b>α = 30°</b> (g = 9,8 m/s²). Quelle hauteur atteint-il au niveau d’un mur situé à <b>x = 25 m</b> ? (arrondis au dixième)",
+      4.2, "m", 0.2,
+      "Utilise l’équation de la trajectoire : y = x·tanα − g·x²/(2·v₀²·cos²α).",
+      ["tan 30° ≈ 0,577 et cos²30° = 0,75", "y = 25 × 0,577 − 9,8 × 25² / (2 × 400 × 0,75)", "y = 14,43 − 6125/600 = 14,43 − 10,21", "<b>y ≈ 4,2 m</b>"]),
+    ex("Projectile : <b>v₀ = 40 m/s</b>, <b>α = 60°</b>, <b>g = 9,8 m/s²</b>. Quelle est la flèche ?",
+      61.2, "m", 1,
+      "h = v₀²·sin²α / (2g). Rappel : sin 60° ≈ 0,866.",
+      ["sin²60° = 0,75", "h = 1600 × 0,75 / (2 × 9,8) = 1200/19,6", "<b>h ≈ 61,2 m</b>"]),
+    ex("Un mobile a pour loi horaire <b>x(t) = 3·t² − 2·t + 1</b> (m). Quelle est son accélération ?",
+      6, "m/s²", 0.05,
+      "Dérive deux fois la position pour obtenir l’accélération.",
+      ["v(t) = dx/dt = 6·t − 2", "a(t) = dv/dt = 6", "<b>a = 6 m/s²</b>"]),
+    ex("Un objet est lancé <b>horizontalement à 15 m/s</b> depuis <b>20 m</b> de haut (g = 10 m/s²). Quelle distance horizontale parcourt-il avant de toucher le sol ?",
+      30, "m", 0.3,
+      "Deux mouvements indépendants : chute verticale (pour le temps) et vitesse horizontale constante.",
+      ["Chute : h = ½·g·t² → t = √(2×20/10) = 2 s", "Horizontal : x = vₓ × t = 15 × 2", "<b>x = 30 m</b>"]),
+    ex("Tir vertical : <b>v₀ = 30 m/s</b>, <b>g = 10 m/s²</b>. Quelle est l’altitude du mobile à <b>t = 5 s</b> ?",
+      25, "m", 0.3,
+      "z(t) = v₀·t − ½·g·t² (le sommet est atteint à t = 3 s, le mobile redescend ensuite).",
+      ["z(t) = 30×5 − ½×10×5²", "z = 150 − 125", "<b>z = 25 m</b> (sommet à 45 m à t = 3 s)"]),
+  ]
+});
+
+/* ---------- 7 · GÉNIE 💎 ---------- */
+TIERS.push({
+  name:"Génie", emoji:"💎", color:"#7fe3ff", sub:"Défis ultimes — plusieurs étapes enchaînées",
+  ex:[
+    ex("Un ballon est lancé du sol à <b>v₀ = 25 m/s</b> sous <b>α = 37°</b> (cos = 0,8 ; tan = 0,75), <b>g = 10 m/s²</b>. Il frappe un mur vertical situé à <b>x = 20 m</b>. À quelle hauteur tape-t-il le mur ?",
+      10, "m", 0.25,
+      "Équation de la trajectoire : y = x·tanα − g·x²/(2·v₀²·cos²α).",
+      ["v₀²·cos²α = 625 × 0,64 = 400", "y = 20 × 0,75 − 10 × 400 / (2 × 400)", "y = 15 − 4000/800 = 15 − 5", "<b>y = 10 m</b>"]),
+    ex("Frottements : <b>v(t) = v₀·e^(−t/τ)</b> avec <b>v₀ = 10 m/s</b> et <b>τ = 4 s</b>. Au bout de combien de temps la vitesse vaut-elle <b>2 m/s</b> ?",
+      6.44, "s", 0.2,
+      "Résous e^(−t/τ) = v/v₀, puis utilise le logarithme népérien (ln 5 ≈ 1,609).",
+      ["e^(−t/4) = 2/10 = 0,2", "−t/4 = ln(0,2) = −1,609", "t = 4 × 1,609", "<b>t ≈ 6,44 s</b>"]),
+    ex("Projectile : <b>v₀ = 20 m/s</b>, <b>α = 45°</b>, <b>g = 10 m/s²</b>. À quelle distance x (la plus petite) le projectile se trouve-t-il à la hauteur <b>y = 5 m</b> ?",
+      5.86, "m", 0.2,
+      "Écris y en fonction de x, puis résous l’équation y = 5 (équation du second degré).",
+      ["y = x − 10x²/(2×400×0,5) = x − x²/40", "x − x²/40 = 5 → x² − 40x + 200 = 0", "Δ = 1600 − 800 = 800 → √Δ ≈ 28,3", "x = (40 − 28,3)/2", "<b>x ≈ 5,86 m</b>"]),
+    ex("Un mobile MRUA a <b>v₀ = 8 m/s</b> et <b>a = −0,5 m/s²</b>. Quelle distance parcourt-il avant de changer de sens ?",
+      64, "m", 0.5,
+      "Il change de sens quand sa vitesse s’annule : distance = v₀²/(2|a|).",
+      ["v = 0 → d = v₀²/(2|a|)", "d = 64 / (2 × 0,5) = 64/1", "<b>d = 64 m</b>"]),
+    ex("Deux voitures roulent dans le même sens : A à <b>25 m/s</b>, B à <b>15 m/s</b>, avec 60 m d’avance pour B. Au bout de combien de temps A rattrape-t-elle B ?",
+      6, "s", 0.1,
+      "Travaille dans le référentiel de B : vitesse relative = 25 − 15.",
+      ["Vitesse de A par rapport à B : v = 25 − 15 = 10 m/s", "t = écart / v_rel = 60 / 10", "<b>t = 6 s</b>"]),
+  ]
+});
+
+/* ---------- état + sauvegarde ---------- */
+const ES_KEY = "cinema_ex_prog";
+const E = { xp:0, best:{}, t:0, i:0, attempts:0, hintUsed:false, answered:false, sessionXP:0, rating:0, wishes:[], wishOther:"" };
+function eload(){ try{ const d=JSON.parse(localStorage.getItem(ES_KEY)); if(d){ E.xp=d.xp||0; E.best=d.best||{}; E.rating=d.rating||0; E.wishes=d.wishes||[]; E.wishOther=d.wishOther||""; } }catch(e){} }
+function esave(){ try{ localStorage.setItem(ES_KEY, JSON.stringify({xp:E.xp,best:E.best,rating:E.rating,wishes:E.wishes,wishOther:E.wishOther})); }catch(e){} }
+const MAX_XP = 1800;
+function efmt(x){ return String(x).replace(".", ","); }
+function estars(n){ return "⭐".repeat(n) + "✩".repeat(3-n); }
+function exTotalFirst(){ return Object.keys(E.best).filter(k => E.best[k] && E.best[k].f).length; }
+function exRank(){ const x=E.xp; if(x>=1500)return"💎 Génie"; if(x>=1100)return"🟣 Expert"; if(x>=750)return"🔴 Confirmé"; if(x>=400)return"🟡 Intermédiaire"; if(x>=100)return"🟩 Apprenti"; return"🟢 Débutant"; }
+
+/* ---------- liste des niveaux ---------- */
+function exTierStats(ti){
+  let n=0, first=0;
+  for(let i=0;i<5;i++){ const b=E.best[ti+"-"+i]; if(b){ n++; if(b.f) first++; } }
+  const st = first>=5?3 : first>=3?2 : first>=1?1 : 0;
+  return { n, first, stars:st };
+}
+function exDots(ti){ let s=""; for(let i=0;i<8;i++) s += `<i style="${i<=ti?`background:${TIERS[i].color}`:""}"></i>`; return s; }
+function renderTiers(){
+  const list=$id("exTiersList"); list.innerHTML="";
+  TIERS.forEach((tr,ti)=>{
+    const st=exTierStats(ti);
+    const b=document.createElement("button");
+    b.className="exTier";
+    b.innerHTML=`<div class="dic" style="border:1px solid ${tr.color}66;background:${tr.color}22">${tr.emoji}</div>
+      <div class="meta"><div class="nm">${tr.name}</div><div class="ds">${tr.sub}</div><div class="exDots">${exDots(ti)}</div></div>
+      <div style="text-align:right;flex:0 0 auto"><div class="stars">${estars(st.stars)}</div><div class="prog">${st.first}/5</div></div>`;
+    b.onclick=()=>startTier(ti);
+    list.appendChild(b);
+  });
+  $id("exTiersProg").textContent = exTotalFirst()+"/40";
+}
+
+/* ---------- exercice ---------- */
+function startTier(ti){ E.t=ti; E.i=0; E.sessionXP=0; startEx(); show("scr-ex"); }
+function startEx(){
+  E.attempts=0; E.hintUsed=false; E.answered=false;
+  const tr=TIERS[E.t], e=tr.ex[E.i];
+  $id("exPill").innerHTML = tr.emoji+" "+tr.name;
+  $id("exCount").textContent = (E.i+1)+" / 5";
+  const body=$id("exBody"); body.innerHTML="";
+
+  const q=document.createElement("div"); q.className="exQ"; q.innerHTML=e.q; body.appendChild(q);
+
+  const row=document.createElement("div"); row.className="exNum";
+  const inp=document.createElement("input");
+  inp.id="exInput"; inp.type="text"; inp.autocomplete="off"; inp.placeholder="ta réponse";
+  inp.inputMode = (e.ans<0) ? "text" : "decimal";
+  inp.addEventListener("keydown",ev=>{ if(ev.key==="Enter"){ ev.preventDefault(); if(!E.answered) checkAnswer(); } });
+  const unit=document.createElement("div"); unit.className="exUnit"; unit.textContent="= "+e.unit;
+  row.appendChild(inp); row.appendChild(unit); body.appendChild(row);
+
+  const acts=document.createElement("div"); acts.className="stack"; acts.id="exActions"; acts.style.marginTop=".85rem";
+  acts.innerHTML=`<div style="display:flex;gap:.6rem">
+      <button class="btn ghost" id="exHint" style="flex:1">💡 Indice</button>
+      <button class="btn" id="exForm" style="flex:0 0 3.1rem">📋</button>
+      <button class="btn ok" id="exCheck" style="flex:1.4">✅ Vérifier</button>
+    </div>`;
+  body.appendChild(acts);
+  const fb=document.createElement("div"); fb.id="exFeedback"; body.appendChild(fb);
+
+  $id("exHint").onclick=()=>{
+    E.hintUsed=true;
+    if(!document.getElementById("exHintBox")){
+      const h=document.createElement("div"); h.className="exHint"; h.id="exHintBox";
+      h.innerHTML="<b>💡 Indice :</b> "+e.hint;
+      body.insertBefore(h, acts);
+    }
+  };
+  $id("exForm").onclick=showFicheOvl;
+  $id("exCheck").onclick=checkAnswer;
+}
+function exParse(str){ return parseFloat(String(str).replace(",", ".").replace(/\s/g,"")); }
+function checkAnswer(){
+  if(E.answered) return;
+  const e=TIERS[E.t].ex[E.i];
+  const inp=$id("exInput");
+  const val=exParse(inp.value);
+  if(isNaN(val)){ beep(false); inp.style.borderColor="var(--ko)"; return; }
+  E.attempts++; E.answered=true;
+  const ok = Math.abs(val-e.ans) <= (e.tol||0.01);
+  const key=E.t+"-"+E.i;
+  const base=(E.t+1)*10;
+  const prev=E.best[key]||{p:0,f:0};
+  if(ok){
+    const first=E.attempts===1;
+    const pts = first ? (E.hintUsed?Math.round(base*0.6):base) : 0;
+    E.best[key]={ p:Math.max(prev.p,pts), f: first?1:prev.f };
+    E.sessionXP += pts;
+    beep(true);
+  } else {
+    E.best[key]={ p:prev.p, f:prev.f };
+    beep(false);
+  }
+  E.xp = Object.keys(E.best).reduce((a,k)=>a+(E.best[k].p||0),0);
+  esave(); exUpdateHome();
+  showFeedback(ok,e);
+}
+function showFeedback(ok,e){
+  const fb=$id("exFeedback");
+  const p=document.createElement("div");
+  p.className="exPanel "+(ok?"ok":"ko");
+  p.innerHTML=`<h4>${ok?"✅ Bravo, c'est exact !":"❌ Pas tout à fait…"}</h4>
+    <div>La bonne réponse est <b>${efmt(e.ans)} ${e.unit}</b>.</div>
+    <ol class="exSteps">${e.sol.map(s=>`<li>${s}</li>`).join("")}</ol>`;
+  fb.appendChild(p);
+  const row=document.createElement("div"); row.className="stack"; row.style.marginTop=".85rem";
+  row.innerHTML=`<button class="btn big" id="exNext">${E.i>=4?"🏁 Terminer le niveau":"Suivant →"}</button>`;
+  fb.appendChild(row);
+  $id("exNext").onclick=nextEx;
+  const acts=$id("exActions"); if(acts) acts.style.display="none";
+  p.scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+function nextEx(){ E.i++; if(E.i>=5) endTierEx(); else { startEx(); $id("exBody").scrollTop=0; } }
+function endTierEx(){
+  const st=exTierStats(E.t), tr=TIERS[E.t];
+  beep(true);
+  const grade = st.first===5 ? "Sans faute, impressionnant !" : st.first>=3 ? "Bien joué !" : st.first>=1 ? "Continue comme ça !" : "Courage, refais ce niveau !";
+  $id("exResBody").innerHTML=`<div class="exStars">${estars(st.stars)}</div>
+    <div class="rtitle">${tr.emoji} ${tr.name}</div>
+    <div class="rtext">${grade}<br>Tu as réussi <b>${st.first}/5</b> exercices du premier coup.</div>
+    <div class="rscore">
+      <span class="exChip">⭐ <b>${st.first}/5</b> du 1er coup</span>
+      <span class="exChip">✨ <b>+${E.sessionXP}</b> XP</span>
+      <span class="exChip">🏅 <b>${E.xp}</b> XP</span>
+    </div>`;
+  const next = E.t < 7;
+  $id("exResBtns").innerHTML=`<button class="btn big" id="exNextTier">${next?"Niveau suivant →":"🏠 Retour à l'accueil"}</button>
+    <div style="display:flex;gap:.6rem">
+      <button class="btn ghost" id="exRedo" style="flex:1">↻ Refaire</button>
+      <button class="btn ghost" id="exToList" style="flex:1">🎚️ Niveaux</button>
+    </div>`;
+  $id("exNextTier").onclick=()=>{ if(next) startTier(E.t+1); else show("scr-home"); };
+  $id("exRedo").onclick=()=>startTier(E.t);
+  $id("exToList").onclick=()=>{ renderTiers(); show("scr-tiers"); };
+  exUpdateHome();
+  show("scr-exres");
+}
+function exUpdateHome(){
+  const el=$id("exHomeStats");
+  if(el) el.innerHTML=`${exRank()} · ⭐ <b>${exTotalFirst()}/40</b> réussis · ✨ <b>${E.xp}</b> XP`;
+}
+
+/* ---------- fiche dans une fenêtre ---------- */
+function showFicheOvl(){
+  const html =
+    FICHE.map(s=>`<div class="card"><div class="ct">${s.h}</div>${s.f.map(x=>`<div class="f">${x}</div>`).join("")}</div>`).join("") +
+    `<div class="card"><div class="ct">🚨 Pièges fréquents</div>${TRAPS.map(t=>`<div class="trap">${t}</div>`).join("")}</div>` +
+    `<button class="btn ghost" id="ovlCloseFiche">Fermer</button>`;
+  openOvl(html);
+  $id("ovlCloseFiche").onclick=closeOvl;
+}
+
+/* ============================================================
+   CRÉDITS / CONTACT / NOTATION / MESSAGE WHATSAPP
+   ============================================================ */
+function buildMessage(){
+  const name=($id("fbName").value||"").trim();
+  const role=$id("fbRole").value;
+  const etab=($id("fbEtab").value||"").trim();
+  const type=$id("fbType").value;
+  const desc=($id("fbDesc").value||"").trim();
+  let m="Bonjour Toby 👋\n";
+  if(name) m += "Je m'appelle "+name+".\n";
+  const intro = (role==="enseignant(e)") ? "J'enseigne" : "Je suis "+role;
+  m += intro + (etab?(" — "+etab):"") + ", et j'utilise ton application de cinématique.\n";
+  m += "Souci rencontré : "+type+"\n";
+  m += "Détail : "+(desc||"(à préciser)")+"\n";
+  m += ratingLine()+"\n";
+  m += wishesLine()+"\n";
+  m += "\n— Message envoyé depuis l'appli Cinématique";
+  return m;
+}
+function waLink(msg){ return "https://wa.me/"+WA_INTL+"?text="+encodeURIComponent(msg); }
+
+function renderCredits(){
+  $id("creditsBody").innerHTML = `
+    <div class="creditCard">
+      <div class="ct">🎬 Cinématique — l'application complète</div>
+      <p>Cours complet, 8 défis interactifs, <b>40 exercices</b> (8 niveaux de difficulté) et fiche de révision pour la Terminale spécialité Physique-Chimie.</p>
+    </div>
+
+    <div class="creditCard">
+      <div class="ct">✍️ Auteur &amp; contact</div>
+      <p>Application créée par <b>${AUTHOR}</b>.<br>Pour un bug, une question ou une suggestion :</p>
+      <p style="margin-top:.5rem">📱 WhatsApp : <b>${WA_DISPLAY}</b></p>
+      <div class="stack" style="margin-top:.6rem">
+        <button class="btn wabtn" id="credWa">💬 Contacter ${AUTHOR} sur WhatsApp</button>
+      </div>
+    </div>
+
+    <div class="creditCard">
+      <div class="ct">🌟 Note l'application sur 5 étoiles</div>
+      <p>Touche le visage qui correspond à ton humeur :</p>
+      <div class="rateFaces" id="credRate">${RATE_FACES.map((f,i)=>`<button data-s="${i+1}" aria-label="${i+1}/5 — ${f.t}" title="${f.t}">${f.e}</button>`).join("")}</div>
+      <div class="rateBig" id="credRateBig">🙂</div>
+      <p class="rateTxt" id="credRateTxt">…/5</p>
+      <p class="muted" style="margin-top:.5rem">Ta note part avec ton message WhatsApp 💬</p>
+    </div>
+
+    <div class="creditCard">
+      <div class="ct">🎓 Quelles matières aimerais-tu aussi avoir en jeu ?</div>
+      <p>Choisis-en autant que tu veux : ça m'aidera à créer la prochaine matière !</p>
+      <div class="wishChips" id="credWish">${WISH_SUBJECTS.map(s=>`<button type="button" data-w="${s}">${s}</button>`).join("")}</div>
+      <div class="fbField" style="margin-top:.6rem"><label>Une autre matière ? (optionnel)</label><input id="wishOther" type="text" placeholder="ex : Géologie, Comptabilité…"></div>
+      <p class="muted" id="wishTxt" style="margin-top:.3rem">Aucune matière choisie pour l'instant</p>
+    </div>
+
+    <div class="creditCard">
+      <div class="ct">📩 Envoyer un message à ${AUTHOR}</div>
+      <div class="fbField"><label>Ton prénom (optionnel)</label><input id="fbName" type="text" placeholder="ex : Awa"></div>
+      <div class="fbField"><label>Tu es…</label><select id="fbRole">
+        <option value="élève">Élève</option>
+        <option value="étudiant(e)">Étudiant(e)</option>
+        <option value="enseignant(e)">Enseignant(e)</option>
+        <option value="parent">Parent</option>
+        <option value="autre">Autre</option>
+      </select></div>
+      <div class="fbField"><label>Où tu fréquentes / enseignes (établissement, classe, ville)</label><input id="fbEtab" type="text" placeholder="ex : Lycée X, 1ère D, Lomé"></div>
+      <div class="fbField"><label>Type de souci</label><select id="fbType">
+        <option>Je n'arrive pas à comprendre quelque chose</option>
+        <option>Bug / problème technique dans l'appli</option>
+        <option>Il manque une leçon ou un exercice</option>
+        <option>Une erreur dans le cours ou une réponse</option>
+        <option>Suggestion d'amélioration</option>
+        <option>Autre</option>
+      </select></div>
+      <div class="fbField"><label>Détaille ton message</label><textarea id="fbDesc" placeholder="Explique ton problème ou ta remarque…"></textarea></div>
+      <button class="btn big wabtn" id="fbSend">📩 Envoyer sur WhatsApp</button>
+      <p class="muted" style="margin-top:.5rem">Le message s'ouvre pré-rempli dans WhatsApp ; tu confirmes l'envoi toi-même.</p>
+    </div>
+
+    <p class="muted" style="margin-bottom:1rem">© ${AUTHOR} — Application pédagogique.<br>Merci de ne pas la revendre ni la modifier sans autorisation.</p>`;
+
+  const row=$id("credRate");
+  const big=$id("credRateBig");
+  const txt=$id("credRateTxt");
+  function paintRating(pop){
+    row.querySelectorAll("button").forEach(x=>x.classList.toggle("on", Number(x.dataset.s)<=E.rating));
+    if(E.rating){
+      const f=RATE_FACES[E.rating-1];
+      big.textContent=f.e;
+      big.style.filter="drop-shadow(0 0 20px "+f.c+")";
+      txt.innerHTML=f.t+" — <b>"+E.rating+"/5</b> "+(E.rating>=4?"🎉":"");
+      if(pop){ big.classList.remove("pop"); void big.offsetWidth; big.classList.add("pop"); }
+    } else {
+      big.textContent="🙂"; big.style.filter="";
+      txt.textContent="…/5";
+    }
+  }
+  row.querySelectorAll("button").forEach(b=>{
+    b.onclick=()=>{ E.rating=Number(b.dataset.s); esave(); paintRating(true); beep(true); };
+  });
+  paintRating(false);
+
+  /* matières souhaitées comme futur jeu */
+  const chips=$id("credWish");
+  function paintWish(){
+    const parts=(E.wishes||[]).slice();
+    if(E.wishOther && E.wishOther.trim()) parts.push("Autre : "+E.wishOther.trim());
+    $id("wishTxt").textContent = parts.length ? ("Choisi : "+parts.join(", ")) : "Aucune matière choisie pour l'instant";
+  }
+  chips.querySelectorAll("button").forEach(b=>{
+    const s=b.dataset.w;
+    b.classList.toggle("on", (E.wishes||[]).indexOf(s)>=0);
+    b.onclick=()=>{
+      const i=(E.wishes||[]).indexOf(s);
+      if(i>=0) E.wishes.splice(i,1); else E.wishes.push(s);
+      b.classList.toggle("on", E.wishes.indexOf(s)>=0);
+      esave(); paintWish(); beep(true);
+    };
+  });
+  const other=$id("wishOther");
+  other.value=E.wishOther||"";
+  other.oninput=()=>{ E.wishOther=other.value; esave(); paintWish(); };
+  paintWish();
+
+  $id("credWa").onclick=()=>window.open(waLink(
+    "Bonjour Toby 👋, j'utilise ton application de cinématique et je voulais te contacter.\n"+ratingLine()+"\n"+wishesLine()
+  ), "_blank");
+  $id("fbSend").onclick=()=>window.open(waLink(buildMessage()), "_blank");
+}
+
+/* ---------- anti-copie léger (best effort) ---------- */
+document.addEventListener("contextmenu", e=>{ if(e.target.closest("#app")) e.preventDefault(); });
+
+/* ---------- initialisation du module ---------- */
+function initModule(){
+  if(initModule._done) return; initModule._done=true;
+  eload();
+  SCREENS.push("scr-tiers","scr-ex","scr-exres","scr-credits");
+  renderTiers();
+  renderCredits();
+  exUpdateHome();
+  $id("btnExos").onclick=()=>{ renderTiers(); exUpdateHome(); show("scr-tiers"); };
+  $id("btnCredits").onclick=()=>{ renderCredits(); show("scr-credits"); };
+  $id("exQuit").onclick=()=>{ renderTiers(); show("scr-tiers"); };
+  $id("exHomeBrand").onclick=()=>{ renderCredits(); show("scr-credits"); };
+}
+document.addEventListener("DOMContentLoaded", initModule);
+if(document.readyState !== "loading") initModule();
+})();
+
+
+/* ============================================================
+   5) INITIALISATION
+   ============================================================ */
+function init(){
+  if(init._done) return;
+  init._done = true;
+  fitFont();
+  buildCourse();
+  buildFiche();
+  renderHome();
+  renderMap();
+
+  document.addEventListener("click", e => {
+    const b = e.target.closest("[data-go]");
+    if(b){ show(b.dataset.go); if(b.dataset.go === "scr-map") renderMap(); }
+  });
+
+  $("#btnPlay").onclick = () => {
+    let start = null;
+    for(let i = 0; i < LEVELS.length; i++){ if(progress[i] === undefined){ start = i; break; } }
+    start === null ? startFinal() : startLevel(start);
+  };
+  $("#btnCourse").onclick = () => show("scr-course");
+  $("#btnCourse2").onclick = () => show("scr-course");
+  $("#btnFiche").onclick = () => show("scr-fiche");
+  $("#btnFiche2").onclick = () => show("scr-fiche");
+  $("#btnSound").onclick = () => { soundOn = !soundOn; try{ localStorage.setItem("cinema_son", soundOn ? "1" : "0"); }catch(e){} renderHome(); };
+  $("#btnReset").onclick = () => {
+    openOvl(`<div class="big">↺</div><h3>Recommencer à zéro ?</h3>
+      <p>Toute ta progression (étoiles et niveaux) sera effacée.</p>
+      <div class="stack">
+        <button class="btn danger" data-ovl="reset">Oui, tout effacer</button>
+        <button class="btn ghost" id="ovlCancel">Annuler</button>
+      </div>`);
+    $("#ovlCancel").onclick = closeOvl;
+  };
+  $("#gameQuit").onclick = () => {
+    openOvl(`<div class="big">⏸️</div><h3>Quitter le niveau ?</h3>
+      <p>La progression de ce niveau ne sera pas enregistrée.</p>
+      <div class="stack">
+        <button class="btn" data-ovl="quit">Quitter</button>
+        <button class="btn ghost" id="ovlCancel2">Reprendre</button>
+      </div>`);
+    $("#ovlCancel2").onclick = closeOvl;
+  };
+  $("#quizQuit").onclick = () => {
+    openOvl(`<div class="big">⏸️</div><h3>Quitter le quiz ?</h3>
+      <p>La progression de ce niveau ne sera pas enregistrée.</p>
+      <div class="stack">
+        <button class="btn" data-ovl="quit">Quitter</button>
+        <button class="btn ghost" id="ovlCancel3">Reprendre</button>
+      </div>`);
+    $("#ovlCancel3").onclick = closeOvl;
+  };
+
+  // touches 1/2/3 sur ordinateur
+  document.addEventListener("keydown", e => {
+    if(!$("#scr-quiz").classList.contains("active")) return;
+    const k = e.key.toUpperCase();
+    const idx = ["A","B","C","D"].indexOf(k);
+    if(idx >= 0){ const b = $$("#qopts .opt")[idx]; if(b) b.click(); }
+  });
+
+  // plein écran mobile au premier tap (optionnel, silencieux)
+  document.body.addEventListener("touchstart", function once(){
+    document.body.removeEventListener("touchstart", once);
+    if(document.documentElement.requestFullscreen && !document.fullscreenElement){
+      document.documentElement.requestFullscreen().catch(()=>{});
+    }
+  }, { once:true });
+
+  window.addEventListener("blur", () => { if(actx && actx.state === "running") actx.suspend(); });
+}
+
+document.addEventListener("DOMContentLoaded", init);
+if(document.readyState !== "loading") init();
+
+</script>
+</body>
+</html>
